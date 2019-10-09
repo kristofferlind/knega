@@ -12,8 +12,5 @@
 		"ineffassign",
 		"misspell",
 		"vet"
-	],
-	"Linters": {
-		"goimports": {"Command": "goimports -l -local github.com/simplesurance"}
-  }
+	]
 }

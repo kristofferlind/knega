@@ -34,7 +34,12 @@ func main() {
     {
       Name:  "pipeline",
       Usage: "Checks for Taskfile.yml, if present run that, otherwise run default",
-      Action: test,
+      Action: pipeline,
+    },
+    {
+      Name:  "create-chart",
+      Usage: "Build app chart",
+      Action: pipeline,
     },
   }
 
