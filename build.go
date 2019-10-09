@@ -10,7 +10,7 @@ import (
 
 func build(c *cli.Context) error {
   if fileExists("Dockerfile") {
-    command := exec.Command("docker", "build", "-t", "app", ".")
+    command := exec.Command("docker", "build", "-t", "app", "--iidfile", "container.id", ".")
     command.Stdout = os.Stdout
     command.Stderr = os.Stderr
     err := command.Run()

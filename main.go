@@ -7,14 +7,6 @@ import (
   "github.com/urfave/cli"
 )
 
-func fileExists(filename string) bool {
-  info, err := os.Stat(filename)
-  if os.IsNotExist(err) {
-      return false
-  }
-  return !info.IsDir()
-}
-
 func main() {
   app := cli.NewApp()
   app.Name = "Knega"
