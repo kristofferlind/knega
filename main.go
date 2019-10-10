@@ -21,6 +21,7 @@ func main() {
     {
       Name:  "test",
       Usage: "Test application (using herokuish)",
+      Category: "Analyze",
       Action: test,
     },
     {
@@ -33,6 +34,24 @@ func main() {
       Usage: "Build app chart",
       Action: createChart,
     },
+    // {
+    //   Name:  "deploy",
+    //   Usage: "Deploy",
+    //   Action: deploy,
+    // },
+    // {
+    //   Name: "all",
+    //   Usage: "all <action> will run action for all applications with changes",
+    //   Subcommands: []cli.Command{
+    //     {
+    //       Name:  "pipeline",
+    //       Usage: "Checks for Taskfile.yml, if present run that, otherwise run default",
+    //       Action: func(c *cli.Context) {
+    //         return all(c, pipeline)
+    //       }
+    //     },
+    //   }
+    // }
   }
 
   err := app.Run(os.Args)
