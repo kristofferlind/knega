@@ -31,7 +31,7 @@ func main() {
     {
       Name:  "create-chart",
       Usage: "Build app chart",
-      Action: pipeline,
+      Action: createChart,
     },
   }
 

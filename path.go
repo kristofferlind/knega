@@ -4,18 +4,20 @@ import (
   "os"
 )
 
-func pathExists(path string) bool {
-  info, err := os.Stat(path)
+func fileExists(filename string) bool {
+  info, err := os.Stat(filename)
   if os.IsNotExist(err) {
-      return false
+    return false
   }
+
   return !info.IsDir()
 }
 
-func fileExists(filename string) bool {
-  return pathExists(filename);
-}
-
 func directoryExists(directory string) bool {
-  return pathExists(directory);
+  info, err := os.Stat(directory)
+  if os.IsNotExist(err) {
+    return false
+  }
+
+  return info.IsDir()
 }
