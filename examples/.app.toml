@@ -1,0 +1,4 @@
+name = "my-application"
+
+# See defaults in .knega.root.toml
+# Any of those settings can be used here and will overwrite whatever was set in root

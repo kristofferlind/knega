@@ -39,19 +39,40 @@ func main() {
     //   Usage: "Deploy",
     //   Action: deploy,
     // },
-    // {
-    //   Name: "all",
-    //   Usage: "all <action> will run action for all applications with changes",
-    //   Subcommands: []cli.Command{
-    //     {
-    //       Name:  "pipeline",
-    //       Usage: "Checks for Taskfile.yml, if present run that, otherwise run default",
-    //       Action: func(c *cli.Context) {
-    //         return all(c, pipeline)
-    //       }
-    //     },
-    //   }
-    // }
+    {
+      Name: "all",
+      Usage: "all <action> will run action for all applications with changes",
+      Subcommands: []cli.Command{
+        {
+          Name:  "check",
+          Usage: "Run build command defined in application configs where changes have occurred",
+          Action: func(c *cli.Context) error {
+            return all(c, "Build")
+          },
+        },
+        {
+          Name:  "build",
+          Usage: "Run build command defined in application configs where changes have occurred",
+          Action: func(c *cli.Context) error {
+            return all(c, "Build")
+          },
+        },
+        {
+          Name:  "analyze",
+          Usage: "Run analyze command defined in application configs where changes have occurred",
+          Action: func(c *cli.Context) error {
+            return all(c, "Build")
+          },
+        },
+        {
+          Name:  "release",
+          Usage: "Run release command in all applications, passing in $INPUTS_HASH",
+          Action: func(c *cli.Context) error {
+            return all(c, "Build")
+          },
+        },
+      },
+    },
   }
 
   err := app.Run(os.Args)
