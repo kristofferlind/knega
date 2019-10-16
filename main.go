@@ -12,6 +12,14 @@ func main() {
   app.Name = "Knega"
   app.Usage = "A collection of tasks for analyzing, testing, building and deploying your application"
 
+  app.Flags = []cli.Flag {
+    cli.StringFlag{
+      Name: "application-version",
+      Value: "",
+      Usage: "Version tag to be used for build/create-chart commands",
+    },
+  }
+
   app.Commands = []cli.Command{
     {
       Name:  "build",
@@ -34,11 +42,11 @@ func main() {
       Usage: "Build app chart",
       Action: createChart,
     },
-    // {
-    //   Name:  "deploy",
-    //   Usage: "Deploy",
-    //   Action: deploy,
-    // },
+    {
+      Name:  "release",
+      Usage: "Deploy",
+      Action: test,
+    },
     {
       Name: "all",
       Usage: "all <action> will run action for all applications with changes",

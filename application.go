@@ -1,5 +1,13 @@
 package main
 
+import (
+  "path"
+  "path/filepath"
+  "log"
+  "crypto/sha512"
+  "encoding/hex"
+)
+
 type Application struct {
   path string
   name string
@@ -24,15 +32,15 @@ func initializeApplication(applicationPath string) Application {
   }
 
   var rawInputPaths []string
-  fileInputPaths := fileInputPatternsToPaths(applicationConfiguration.fileInputPatterns)
-  rawInputPaths = append(rawInputPaths, fileInputPaths)
+  fileInputPaths := fileInputPatternsToPaths(applicationConfiguration.fileInputPatterns, applicationPath)
+  rawInputPaths = append(rawInputPaths, fileInputPaths...)
 
   gitFileInputPaths := gitFileInputPatternsToPaths(applicationConfiguration.gitFileInputPatterns, applicationPath)
-  rawInputPaths = append(rawInputPaths, gitFileInputPaths, applicationPath)
+  rawInputPaths = append(rawInputPaths, gitFileInputPaths...)
 
   inputPaths := deDuplicateStringSlice(rawInputPaths)
   application.inputs = initializeBuildInputs(inputPaths)
-  application.inputsHash = generateInputsHash(inputPaths)
+  application.inputsHash = generateInputsHash(application.inputs)
 
   // application.outputArtifacts :=
 
@@ -44,14 +52,14 @@ func fileInputPatternsToPaths(patterns []string, applicationPath string) []strin
   var results []string
 
   for _, pattern := range patterns {
-    if !isAbsolutePath() {
+    if !isAbsolutePath(pattern) {
       pattern = path.Join(applicationPath)
     }
     matches, err := filepath.Glob(pattern)
-    if err {
+    if err != nil {
       log.Fatal(err)
     }
-    results = append(results, matches)
+    results = append(results, matches...)
   }
   return results
 }
@@ -64,7 +72,7 @@ func gitFileInputPatternsToPaths(patterns []string, applicationPath string) []st
     for _, relativePath := range matches {
       absolutePath := filepath.Join(applicationPath, relativePath)
       if fileExists(absolutePath) {
-        results = append(results, matches)
+        results = append(results, matches...)
       }
     }
   }
@@ -77,7 +85,7 @@ func deDuplicateStringSlice(paths []string) []string {
   var results []string
   for _, path := range paths {
     exists := pathMap[path]
-    if ! exists {
+    if exists == "" {
       pathMap[path] = path
       results = append(results, path)
     }
@@ -91,7 +99,7 @@ func generateInputsHash (inputs []BuildInput) string {
   for _, input := range inputs {
     hash.Write(input.Hash())
   }
-  checksum := hash.Sum512(nil)
+  checksum := hash.Sum(nil)
 
   return hex.EncodeToString(checksum)
 }

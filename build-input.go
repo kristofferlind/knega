@@ -2,6 +2,9 @@ package main
 
 import (
   "crypto/sha512"
+  "os"
+  "log"
+  "io"
 )
 
 type BuildInput struct {
@@ -35,10 +38,10 @@ func (buildInput *BuildInput) Hash() []byte {
 
   hash := sha512.New()
 
-  copyErr := io.Copy(hash, file)
+  _, copyErr := io.Copy(hash, file)
   if copyErr != nil {
     log.Fatal(copyErr)
   }
 
-  return hash.Sum512()
+  return hash.Sum(nil)
 }

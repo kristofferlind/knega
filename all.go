@@ -2,6 +2,7 @@ package main
 
 import (
   "runtime"
+  "log"
 
   "github.com/urfave/cli"
 )
@@ -14,12 +15,12 @@ type Job struct {
 }
 
 func worker (jobs <-chan Job, results chan<- error) {
-  for job := range jobs {
+  // for job := range jobs {
     // set working directory to application.path
     // logs, err := execute action
     // print logs
     // results <- err
-  }
+  // }
 }
 
 // func remoteWorker as above, execute as job on k8s cluster?
@@ -30,6 +31,9 @@ func all(c *cli.Context, action string) error {
   applicationsCount := len(repository.applications)
   jobs := make(chan Job, applicationsCount)
   results := make(chan error, applicationsCount)
+
+  log.Print("Workers:")
+  log.Print(workerCount)
 
   // for cpu threads, initiate worker
   for workerId := 1; workerId <= workerCount; workerId++ {

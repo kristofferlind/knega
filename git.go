@@ -1,13 +1,20 @@
 package main
 
+import (
+  "log"
+  "os/exec"
+  "strings"
+)
+
 func gitLsFiles(directory string, pattern string) []string {
-  result, err := exec.command("git", "-c", "core.quotepath=off", "ls-files", pattern).Directory(directory).Run()
+  command := exec.Command("git", "-c", "core.quotepath=off", "ls-files", pattern)
+  command.Dir = directory
+  result, err := command.Output()
   if err != nil {
     log.Fatal(err)
   }
-  if result.exitCode != 0 {
-    log.Fatal("Something went wrong when running git ls-files")
-  }
-  output := result.StrOutput()
+  output := string(result[:])
   relativePaths := strings.Split(output, "\n")
+
+  return relativePaths
 }

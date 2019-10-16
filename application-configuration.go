@@ -95,13 +95,12 @@ func getApplicationConfiguration(configurationPath string) ApplicationConfigurat
     fileInputPatterns: fileInputPatterns,
     gitFileInputPatterns: gitFileInputPatterns,
     // outputs: []BuildOutput,
-    commands: {
-      check: checkCommand,
-      build: buildCommand,
-      analyze: analyzeCommand,
-      release: releaseCommand,
-    },
   }
+
+  configuration.commands.check = checkCommand // or default knega test
+  configuration.commands.build = buildCommand // or default knega build
+  configuration.commands.analyze = analyzeCommand // or default knega analyze (codequality, performance, dependency vulnerabilities, docker image vulnerabilities)
+  configuration.commands.release = releaseCommand // or default knega release
 
   return configuration
 }

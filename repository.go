@@ -45,6 +45,7 @@ func getApplications(repository Repository) []Application {
     for _, applicationConfigPath := range applicationConfigPaths {
       application := initializeApplication(applicationConfigPath)
       results = append(results, application)
+      log.Print("Found application: " + application.path)
     }
   }
   return results
