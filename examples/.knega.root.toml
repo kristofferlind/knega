@@ -46,22 +46,41 @@ applicationSearchDepth = 2
     packageFileName = "$APPLICATION_NAME-$INPUTS_HASH.tgz"
     repository = ""
 
-# tests and other checks
+# knega all check
 [Check]
-  # commands would work a lot better as yaml, maybe convert?
   # working directory: application directory, can run scripts from root using $ROOT_PATH
-  command = ""
+  commands = [
+    "knega test"
+  ]
 
+# knega all build
 [Build]
   # working directory: application directory, can run scripts from root using $ROOT_PATH
-  command = ""
+  commands = [
+    "knega build",
+    "knega create-chart"
+  ]
 
+# knega all analyze
 [Analyze]
+  # The way I plan on using this is for checks where someone needs to examine the result for it to be worth the compute time
+  # and have this action be manually triggered
+  onlyChanged = false
   # working directory: application directory, can run scripts from root using $ROOT_PATH
-  command = ""
+  commands = [
+    "knega code-quality",
+    "knega dependency-vulnerability",
+    "knega container-vulnerability",
+    "knega performance",
+    "knega generate-report-bundle"
+  ]
 
+# knega all release
 [Release]
+  onlyChanged = false
   # Will run for all applications, regardless of whether it had changes
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   # $INPUTS_HASH is available
-  command = ""
+  commands = [
+    "knega release"
+  ]
