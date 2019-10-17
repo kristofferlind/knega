@@ -8,6 +8,7 @@ import (
 // type Action func(cli.Context) error
 
 type Job struct {
+  application Application
   action string
   commands []string
   workingDirectory string
@@ -51,6 +52,7 @@ func createJob(repository Repository, application Application, action string) Jo
   commands = injectCommandVariablesArray(commands, application, repository)
   job := Job{
     action: action,
+    application: application,
     commands: commands,
     workingDirectory: application.path,
   }

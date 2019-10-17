@@ -41,7 +41,10 @@ func initializeApplication(applicationPath string) Application {
   application.inputs = initializeBuildInputs(inputPaths)
   application.inputsHash = generateInputsHash(application.inputs)
 
-  // application.outputArtifacts :=
+  application.commands.check = applicationConfiguration.commands.check
+  application.commands.build = applicationConfiguration.commands.build
+  application.commands.analyze = applicationConfiguration.commands.analyze
+  application.commands.release = applicationConfiguration.commands.release
 
   return application
 }
