@@ -1,6 +1,8 @@
 package main
 
 import (
+  "log"
+
   "github.com/spf13/viper"
 )
 
@@ -10,10 +12,10 @@ type ApplicationConfiguration struct {
   gitFileInputPatterns []string
   outputs []BuildOutput
   commands struct {
-    check string
-    build string
-    analyze string
-    release string
+    check []string
+    build []string
+    analyze []string
+    release []string
   }
 }
 
@@ -44,7 +46,7 @@ func injectVariablesArray(values []string) []string {
 
 // TODO: can override functions be just one that takes multiple types?
 func handleStringSliceOverride(rootValue []string, applicationValue []string) []string {
-  if applicationValue != nil {
+  if len(applicationValue) > 0 {
     return applicationValue
   } else {
     return rootValue
@@ -63,32 +65,36 @@ func getApplicationConfiguration(configurationPath string) ApplicationConfigurat
   configurationFile := viper.New()
   configurationFile.SetConfigName(".app")
   configurationFile.AddConfigPath(configurationPath)
+  err := configurationFile.ReadInConfig()
+  if err != nil {
+    log.Fatal(err)
+  }
 
   rootFileInputPatterns := configurationFile.GetStringSlice("Input.Files.patterns")
   applicationFileInputPatterns := configurationFile.GetStringSlice("Input.Files.patterns")
   rawFileInputPatterns := handleStringSliceOverride(rootFileInputPatterns, applicationFileInputPatterns)
   fileInputPatterns := injectVariablesArray(rawFileInputPatterns)
 
-  rootGitInputPaths := viper.GetStringSlice("Input.GitFiles.paths")
-  applicationGitInputPaths := configurationFile.GetStringSlice("Input.GitFiles.paths")
-  rawGitFileInputPatterns := handleStringSliceOverride(rootGitInputPaths, applicationGitInputPaths)
+  rootGitInputPatterns := viper.GetStringSlice("Input.GitFiles.patterns")
+  applicationGitInputPatterns := configurationFile.GetStringSlice("Input.GitFiles.patterns")
+  rawGitFileInputPatterns := handleStringSliceOverride(rootGitInputPatterns, applicationGitInputPatterns)
   gitFileInputPatterns := injectVariablesArray(rawGitFileInputPatterns)
 
-  rootCheckCommand := viper.GetString("Check.command")
-  applicationCheckCommand := configurationFile.GetString("Check.command")
-  checkCommand := handleStringOverride(rootCheckCommand, applicationCheckCommand)
+  rootCheckCommand := viper.GetStringSlice("Check.commands")
+  applicationCheckCommand := configurationFile.GetStringSlice("Check.commands")
+  checkCommand := handleStringSliceOverride(rootCheckCommand, applicationCheckCommand)
 
-  rootBuildCommand := viper.GetString("Build.command")
-  applicationBuildCommand := configurationFile.GetString("Build.command")
-  buildCommand := handleStringOverride(rootBuildCommand, applicationBuildCommand)
+  rootBuildCommand := viper.GetStringSlice("Build.commands")
+  applicationBuildCommand := configurationFile.GetStringSlice("Build.commands")
+  buildCommand := handleStringSliceOverride(rootBuildCommand, applicationBuildCommand)
 
-  rootAnalyzeCommand := viper.GetString("Analyze.command")
-  applicationAnalyzeCommand := configurationFile.GetString("Analyze.command")
-  analyzeCommand := handleStringOverride(rootAnalyzeCommand, applicationAnalyzeCommand)
+  rootAnalyzeCommand := viper.GetStringSlice("Analyze.commands")
+  applicationAnalyzeCommand := configurationFile.GetStringSlice("Analyze.commands")
+  analyzeCommand := handleStringSliceOverride(rootAnalyzeCommand, applicationAnalyzeCommand)
 
-  rootReleaseCommand := viper.GetString("Release.command")
-  applicationReleaseCommand := configurationFile.GetString("Release.command")
-  releaseCommand := handleStringOverride(rootReleaseCommand, applicationReleaseCommand)
+  rootReleaseCommand := viper.GetStringSlice("Release.commands")
+  applicationReleaseCommand := configurationFile.GetStringSlice("Release.commands")
+  releaseCommand := handleStringSliceOverride(rootReleaseCommand, applicationReleaseCommand)
 
   configuration := ApplicationConfiguration{
     name: configurationFile.GetString("name"),

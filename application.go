@@ -15,16 +15,15 @@ type Application struct {
   inputs []BuildInput
   outputs []BuildOutput
   commands struct {
-    check string
-    build string
-    analyze string
-    release string
+    check []string
+    build []string
+    analyze []string
+    release []string
   }
 }
 
 func initializeApplication(applicationPath string) Application {
   applicationConfiguration := getApplicationConfiguration(applicationPath)
-
 
   application := Application{
     name: applicationConfiguration.name,
@@ -70,9 +69,10 @@ func gitFileInputPatternsToPaths(patterns []string, applicationPath string) []st
   for _, pattern := range patterns {
     matches := gitLsFiles(applicationPath, pattern)
     for _, relativePath := range matches {
-      absolutePath := filepath.Join(applicationPath, relativePath)
-      if fileExists(absolutePath) {
-        results = append(results, matches...)
+      // TODO: applicationPath is an absolute path, should be rootRelative?
+      path := filepath.Join(applicationPath, relativePath)
+      if fileExists(path) {
+        results = append(results, path)
       }
     }
   }

@@ -14,9 +14,10 @@ type Repository struct {
   // commitId string
   // isWorkTreeDirty bool
   applications []Application
+  baseChartPath string
 }
 
-func initializeRepository() Repository {
+func initializeRepository(shouldIncludeApplications bool) Repository {
   workingDirectory := getWorkingDirectory()
   repositoryPath := findParentDirectoryWithFile(workingDirectory, ".knega.root.toml")
 
@@ -29,11 +30,17 @@ func initializeRepository() Repository {
 
   repository := Repository{
     path: repositoryPath,
+    baseChartPath: repositoryPath + viper.GetString("baseChartPath"),
     searchDirectories: viper.GetStringSlice("applicationPaths"),
     searchDepth: viper.GetInt("applicationSearchDepth"),
   }
-  directoriesExist(repository.searchDirectories)
-  repository.applications = getApplications(repository)
+
+  if shouldIncludeApplications {
+    directoriesExist(repository.searchDirectories)
+    repository.applications = getApplications(repository)
+  }
+
+  log.Printf("Initialized repository %s", repository.path)
 
   return repository
 }
@@ -45,7 +52,7 @@ func getApplications(repository Repository) []Application {
     for _, applicationConfigPath := range applicationConfigPaths {
       application := initializeApplication(applicationConfigPath)
       results = append(results, application)
-      log.Print("Found application: " + application.path)
+      log.Printf("%s: %s", application.name, application.inputsHash)
     }
   }
   return results

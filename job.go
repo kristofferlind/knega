@@ -2,6 +2,7 @@ package main
 
 import (
   "strings"
+  "log"
 )
 
 // type Action func(cli.Context) error
@@ -13,14 +14,15 @@ type Job struct {
 }
 
 // TOOD: use injectVariables instead
-func injectCommandVariables(rawCommand string, application Application, repository Repository) string {
-  command := strings.Replace(rawCommand, "$ROOT", repository.path, -1)
-  command = strings.Replace(command, "$INPUTS_HASH", application.inputsHash, -1)
-  command = strings.Replace(command, "$APPLICATION_NAME", application.name, -1)
+func injectCommandVariables(rawValue string, application Application, repository Repository) string {
+  value := strings.Replace(rawValue, "$ROOT", repository.path, -1)
+  value = strings.Replace(value, "$INPUTS_HASH", application.inputsHash, -1)
+  value = strings.Replace(value, "$APPLICATION_NAME", application.name, -1)
 
-  return command
+  return value
 }
 
+// TODO: use injectVariablesArray instead
 func injectCommandVariablesArray(rawValues []string, application Application, repository Repository) []string {
   var values []string
   for _, rawValue := range rawValues {
@@ -32,8 +34,21 @@ func injectCommandVariablesArray(rawValues []string, application Application, re
 }
 
 func createJob(repository Repository, application Application, action string) Job {
-  rawCommands := application.commands[action]
-  commands := injectCommandVariablesArray(rawCommands, application, repository)
+  var commands []string
+  switch action {
+    case "check":
+      commands = application.commands.check
+    case "build":
+      commands = application.commands.build
+    case "analyze":
+      commands = application.commands.analyze
+    case "release":
+      commands = application.commands.release
+    default:
+      log.Fatal("Action is not available")
+  }
+
+  commands = injectCommandVariablesArray(commands, application, repository)
   job := Job{
     action: action,
     commands: commands,

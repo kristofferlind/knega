@@ -10,7 +10,7 @@ import (
   "github.com/spf13/viper"
 )
 
-func createChart(c *cli.Context) error {
+func createChart(c *cli.Context, repository Repository) error {
   // TODO: create ensureCleanDirectoryExists func in fs/path
   if directoryExists(".generated") {
     rmErr := os.RemoveAll(".generated")
@@ -26,7 +26,7 @@ func createChart(c *cli.Context) error {
     copy.Copy("chart", chartPath)
   } else {
     // set directory in root .knega.root.toml
-    baseChartPath := "../../../shared/default-app"
+    baseChartPath := repository.baseChartPath
     if directoryExists(baseChartPath) {
       err := copy.Copy(baseChartPath, chartPath)
       if err != nil {
@@ -46,7 +46,6 @@ func createChart(c *cli.Context) error {
   // TODO: not yet available, enable once merged (https://github.com/spf13/viper/pull/635)
   // what to do as a workaround until then?
   // lets try rewriting all files to lowercase for now, done at the end
-
   // defaultValues.SetKeysCaseSensitive(true)
 
   err := defaultValues.ReadInConfig()
@@ -109,6 +108,7 @@ func createChart(c *cli.Context) error {
     log.Fatal(commandError)
   }
 
+  /* All values set in deploy-values.yaml needs to overwrite those values in defaultValues, then skip that file in artifacts */
   if fileExists("deploy-values.yml") {
     err := copy.Copy("deploy-values.yml", ".generated/deploy-values.yml")
     if err != nil {
@@ -120,3 +120,11 @@ func createChart(c *cli.Context) error {
 
   return nil
 }
+
+
+
+/*
+upload chart
+
+replicate scripts/upload.sh
+*/

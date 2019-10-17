@@ -60,6 +60,7 @@ func findSubDirectoriesWithFile(directory string, filename string, searchDepth i
       if err != nil {
         log.Fatal(err)
       }
+      absolutePath = strings.Replace(absolutePath, filename, "", 1)
       results = append(results, absolutePath)
     }
 
@@ -86,6 +87,7 @@ func findParentDirectoryWithFile(directory string, filename string) string {
 
       return directoryPath
     }
+    searchDirectoryPath += "../"
   }
   log.Fatal("Could not find parent directory with file")
 

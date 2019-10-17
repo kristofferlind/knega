@@ -31,7 +31,7 @@ func worker (jobs <-chan Job, results chan<- error) {
 // func remoteWorker as above, execute as job on k8s cluster?
 
 func all(c *cli.Context, action string) error {
-  repository := initializeRepository()
+  repository := initializeRepository(true)
   workerCount := runtime.NumCPU() * 2
   applicationsCount := len(repository.applications)
   jobs := make(chan Job, applicationsCount)
