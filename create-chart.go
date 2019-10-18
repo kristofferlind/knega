@@ -10,7 +10,8 @@ import (
   "github.com/spf13/viper"
 )
 
-func createChart(c *cli.Context, repository Repository) error {
+func createChart(cliContext *cli.Context, repository Repository) error {
+  log.Printf("application-version: %s", cliContext.String("application-version"))
   // TODO: create ensureCleanDirectoryExists func in fs/path
   if directoryExists(".generated") {
     rmErr := os.RemoveAll(".generated")
@@ -73,9 +74,11 @@ func createChart(c *cli.Context, repository Repository) error {
   }
   chart.Set("name", applicationName)
 
-  version := c.String("application-version")
-  if version != "" {
-    chart.Set("version", version)
+  applicationVersion := cliContext.String("application-version")
+  chartVersion := chart.GetString("version")
+  if applicationVersion != "" {
+    chart.Set("appVersion", applicationVersion)
+    chart.Set("version", chartVersion + "-" + applicationVersion)
   }
 
   if appConfig.IsSet(("ingressUrl")) {

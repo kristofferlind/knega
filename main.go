@@ -3,6 +3,7 @@ package main
 import (
   "log"
   "os"
+  "path"
 
   "github.com/urfave/cli"
 )
@@ -20,13 +21,23 @@ func main() {
   // for now just get from repository
   repository := initializeRepository(false)
 
-  app.Flags = []cli.Flag {
-    cli.StringFlag{
-      Name: "application-version",
-      Value: "",
-      Usage: "Version tag to be used for build/create-chart commands",
-    },
+  var application Application
+  currentWorkingDirectory := getWorkingDirectory()
+  log.Print(path.Clean(currentWorkingDirectory))
+  log.Print(path.Clean(repository.path))
+  if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+    application = initializeApplication(currentWorkingDirectory)
   }
+
+  // app.Flags = []cli.Flag {
+  //   cli.StringFlag{
+  //     Name: "application-version",
+  //     Value: "",
+  //     Usage: "Version tag to be used for build/create-chart commands",
+  //   },
+  // }
+  //
+  // log.Print(app.String("application-version"))
 
   app.Commands = []cli.Command{
     {
@@ -48,6 +59,11 @@ func main() {
     {
       Name:  "create-chart",
       Usage: "Build app chart",
+      Flags: []cli.Flag{
+        cli.StringFlag{
+          Name: "application-version, inputs-hash",
+        },
+      },
       Action: func(context *cli.Context) error {
         return createChart(context, repository)
       },
@@ -58,6 +74,44 @@ func main() {
       Action: test,
     },
     {
+      Name: "chart",
+      Usage: "chart <action> handles chart actions like create and upload",
+      Subcommands: []cli.Command{
+        {
+          Name: "create",
+          Usage: "knega chart create, creates chart based on app configuration",
+          Flags: []cli.Flag{
+            cli.StringFlag{
+              Name: "application-version, inputs-hash",
+            },
+          },
+          Action: func(context *cli.Context) error {
+            return createChart(context, repository)
+          },
+        },
+        {
+          Name: "upload",
+          Usage: "knega chart upload, uploads chart to helm repository (only works for git based repositories currently)",
+          Flags: []cli.Flag{
+            cli.StringFlag{
+              Name: "application-version, inputs-hash",
+            },
+          },
+          Action: func(context *cli.Context) error {
+            return uploadChart(context, application, repository)
+          },
+        },
+        {
+          Name: "update-index",
+          Usage: "knega chart update-index, updates repository index (done seperately to avoid conflicts while pushing",
+          Action: func(context *cli.Context) error {
+            return updateHelmIndex(context, repository)
+          },
+        },
+      },
+    },
+    {
+      // maybe have all/changed?
       Name: "all",
       Usage: "all <action> will run action for all applications with changes",
       Subcommands: []cli.Command{

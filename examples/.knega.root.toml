@@ -4,7 +4,7 @@
 
 # Used by knega create-chart action, can be overwritten by chartPath in application config
 # If neither is set will use Gitlabs auto-deploy-app chart (https://gitlab.com/gitlab-org/charts/auto-deploy-app/)
-baseChartPath = ""
+baseChartPath = "shared/chart"
 
 # Defines where to look for applications
 applicationPaths = ["applications", "libraries", "infrastructure"]
@@ -45,6 +45,7 @@ applicationSearchDepth = 2
     packageFilePath = "."
     packageFileName = "$APPLICATION_NAME-$INPUTS_HASH.tgz"
     repository = ""
+    git = ""
 
 # knega all check
 [Check]
@@ -58,7 +59,9 @@ applicationSearchDepth = 2
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   commands = [
     "knega build",
-    "knega create-chart"
+    "knega chart create --inputs-hash $INPUTS_HASH",
+    "knega docker upload --inputs-hash $INPUTS_HASH",
+    "knega chart upload --inputs-hash $INPUTS_HASH"
   ]
 
 # knega all analyze
@@ -82,5 +85,5 @@ applicationSearchDepth = 2
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   # $INPUTS_HASH is available
   commands = [
-    "knega release"
+    "knega release --inputs-hash $INPUTS_HASH""
   ]

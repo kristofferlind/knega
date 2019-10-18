@@ -3,7 +3,6 @@ package main
 import (
   "runtime"
   "log"
-  "os/exec"
   "time"
 
   "github.com/urfave/cli"
@@ -18,17 +17,9 @@ func createWorker (done <-chan struct{}, jobs <-chan Job, results chan<- string,
     result := ""
 
     for _, jobCommand := range job.commands {
-      // TODO: need to split command
-      log.Printf("Executing command %s", jobCommand)
-      // commandParts := strings.Split(jobCommand, " ")
-      command := exec.Command("sh", "-c", jobCommand)
-      command.Dir = job.workingDirectory
-      output, err := command.Output()
-      if err != nil {
-        log.Print(err)
-        errors <- err
-      }
-      result += string(output[:])
+      output := executeCommand(jobCommand, job.application.path)
+      log.Print(output)
+      result += output
     }
 
     endTime := time.Now()
