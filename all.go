@@ -4,12 +4,13 @@ import (
   "runtime"
   "log"
   "time"
+  "sync"
 
   "github.com/urfave/cli"
 )
 
 // maybe just include output when error?
-func createWorker (done <-chan struct{}, jobs <-chan Job, results chan<- string, errors chan<- error) {
+func createWorker (workerId int, asyncWorkers *sync.WaitGroup, jobs <-chan Job, results chan<- string) {
   for job := range jobs {
     log.Printf("Start work on %s", job.application.name)
     startTime := time.Now()
@@ -18,33 +19,23 @@ func createWorker (done <-chan struct{}, jobs <-chan Job, results chan<- string,
 
     for _, jobCommand := range job.commands {
       output := executeCommand(jobCommand, job.application.path)
-      log.Print(output)
       result += output
     }
 
     endTime := time.Now()
     timeTaken := endTime.Sub(startTime)
     log.Printf("Successfully ran %s for %s in %s", job.action, job.application.name, timeTaken)
-    select {
-      case results <- result:
-      case <- done:
-        return
-    }
+
+    results <- result
   }
+  asyncWorkers.Done()
 }
 
-func createWorkerPipeline (done <-chan struct{}, jobs []Job) (<-chan string, <-chan error) {
+func createWorkerPipeline (done chan<- bool, jobs []Job) (<-chan string) {
   workerCount := runtime.NumCPU()
   jobsCount := len(jobs)
   jobsChannel := make(chan Job, jobsCount)
-  resultsChannel := make(chan string)
-  errorsChannel := make(chan error, 1)
-
-  for workerId := 1; workerId <= workerCount; workerId++ {
-    go createWorker(done, jobsChannel, resultsChannel, errorsChannel)
-  }
-
-  log.Printf("Started %d workers", workerCount)
+  resultsChannel := make(chan string, jobsCount)
 
   for _, job := range jobs {
     jobsChannel <- job
@@ -52,10 +43,22 @@ func createWorkerPipeline (done <-chan struct{}, jobs []Job) (<-chan string, <-c
   }
   close(jobsChannel)
 
-  return resultsChannel, errorsChannel
+  var asyncWorkers sync.WaitGroup
+  for workerId := 1; workerId <= workerCount; workerId++ {
+    asyncWorkers.Add(1)
+    go createWorker(workerId, &asyncWorkers, jobsChannel, resultsChannel)
+  }
+  asyncWorkers.Wait()
+  close(resultsChannel)
+  done <- true
+
+  log.Printf("Started %d workers", workerCount)
+
+  return resultsChannel
 }
 
 func all(c *cli.Context, action string) error {
+  startTime := time.Now()
   repository := initializeRepository(true)
   var jobs []Job
   for _, application := range repository.applications {
@@ -63,18 +66,20 @@ func all(c *cli.Context, action string) error {
     jobs = append(jobs, job)
   }
 
-  done := make(chan struct{})
+  done := make(chan bool, 1)
   defer close(done)
 
-  results, errors := createWorkerPipeline(done, jobs)
+  results := createWorkerPipeline(done, jobs)
 
   for result := range results {
     log.Print(result)
   }
 
-  if err := <- errors; err != nil {
-    return err
-  }
+  <-done
+
+  endTime := time.Now()
+  timeTaken := endTime.Sub(startTime)
+  log.Printf("Total time taken: %s", timeTaken)
 
   return nil
 }

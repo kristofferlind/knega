@@ -22,12 +22,18 @@ func uploadChart(context *cli.Context, application Application, repository Repos
   repositoryName := application.name + "-repo"
   helmRepositoryPath := path.Join(repository.path, ".generated/", repositoryName)
   if ! directoryExists(helmRepositoryPath) {
-    repositoryURL := "git@github.com:Modity/HelmRepository.git" //repository.outputs.chart.path
+    repositoryURL := repository.helmRepositoryCloneURL
     log.Print(gitCloneRepository(repositoryURL, repositoryName, generatedPath))
   }
   packageFileName := application.name + "-1.0.0-" + application.inputsHash + ".tgz"
   packagePath := path.Join(".generated/", packageFileName)
-  packageDestinationPath := path.Join(helmRepositoryPath, packageFileName)
+
+  packageDestinationDirectory := path.Join(helmRepositoryPath, "charts")
+  if ! directoryExists(packageDestinationDirectory) {
+    os.Mkdir(packageDestinationDirectory, 0777)
+  }
+
+  packageDestinationPath := path.Join(packageDestinationDirectory, packageFileName)
   log.Print(packageDestinationPath)
 
   sourceFile, sourceErr := os.Open(packagePath)

@@ -17,7 +17,8 @@ func gitPull(directory string) string {
 }
 
 func gitCommit(commitMessage string, directory string) string {
-  output := executeCommand("git commit -am \"" + commitMessage + "\"", directory)
+  output := executeCommand("git add -A", directory)
+  output += executeCommand("git commit -m \"" + commitMessage + "\"", directory)
 
   return output
 }

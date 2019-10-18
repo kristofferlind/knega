@@ -15,6 +15,7 @@ type Repository struct {
   // isWorkTreeDirty bool
   applications []Application
   baseChartPath string
+  helmRepositoryCloneURL string
 }
 
 func initializeRepository(shouldIncludeApplications bool) Repository {
@@ -33,6 +34,7 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
     baseChartPath: repositoryPath + viper.GetString("baseChartPath"),
     searchDirectories: viper.GetStringSlice("applicationPaths"),
     searchDepth: viper.GetInt("applicationSearchDepth"),
+    helmRepositoryCloneURL: viper.GetString("helmRepositoryCloneURL"),
   }
 
   if shouldIncludeApplications {

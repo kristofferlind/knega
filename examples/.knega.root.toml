@@ -85,5 +85,5 @@ applicationSearchDepth = 2
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   # $INPUTS_HASH is available
   commands = [
-    "knega release --inputs-hash $INPUTS_HASH""
+    "knega release --inputs-hash $INPUTS_HASH"
   ]
