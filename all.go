@@ -71,8 +71,12 @@ func all(c *cli.Context, action string) error {
 
   results := createWorkerPipeline(done, jobs)
 
+  completedJobs := 0
   for result := range results {
     log.Print(result)
+    completedJobs++
+    currentTime := time.Now()
+    log.Printf("Completed %d of %d jobs in %s", completedJobs, len(jobs), currentTime.Sub(startTime))
   }
 
   <-done

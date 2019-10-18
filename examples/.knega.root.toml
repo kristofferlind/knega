@@ -6,6 +6,10 @@
 # If neither is set will use Gitlabs auto-deploy-app chart (https://gitlab.com/gitlab-org/charts/auto-deploy-app/)
 baseChartPath = "shared/chart"
 
+# these are currently used rather than outputs to skip working out details of outputs for now, will be removed
+helmRepositoryCloneURL = ""
+dockerRepository = "repository.example.com/"
+
 # Defines where to look for applications
 applicationPaths = ["applications", "libraries", "infrastructure"]
 applicationSearchDepth = 2
@@ -59,9 +63,9 @@ applicationSearchDepth = 2
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   commands = [
     "knega build",
-    "knega chart create --inputs-hash $INPUTS_HASH",
-    "knega docker upload --inputs-hash $INPUTS_HASH",
-    "knega chart upload --inputs-hash $INPUTS_HASH"
+    "knega chart create",
+    "knega docker upload",
+    "knega chart upload"
   ]
 
 # knega all analyze
@@ -85,5 +89,5 @@ applicationSearchDepth = 2
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   # $INPUTS_HASH is available
   commands = [
-    "knega release --inputs-hash $INPUTS_HASH"
+    "knega release"
   ]

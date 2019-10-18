@@ -16,6 +16,7 @@ type Repository struct {
   applications []Application
   baseChartPath string
   helmRepositoryCloneURL string
+  dockerRepository string
 }
 
 func initializeRepository(shouldIncludeApplications bool) Repository {
@@ -35,6 +36,7 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
     searchDirectories: viper.GetStringSlice("applicationPaths"),
     searchDepth: viper.GetInt("applicationSearchDepth"),
     helmRepositoryCloneURL: viper.GetString("helmRepositoryCloneURL"),
+    dockerRepository: viper.GetString("dockerRepository"),
   }
 
   if shouldIncludeApplications {

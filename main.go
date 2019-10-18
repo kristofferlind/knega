@@ -57,18 +57,6 @@ func main() {
       Action: pipeline,
     },
     {
-      Name:  "create-chart",
-      Usage: "Build app chart",
-      Flags: []cli.Flag{
-        cli.StringFlag{
-          Name: "application-version, inputs-hash",
-        },
-      },
-      Action: func(context *cli.Context) error {
-        return createChart(context, repository)
-      },
-    },
-    {
       Name:  "release",
       Usage: "Deploy",
       Action: test,
@@ -80,23 +68,13 @@ func main() {
         {
           Name: "create",
           Usage: "knega chart create, creates chart based on app configuration",
-          Flags: []cli.Flag{
-            cli.StringFlag{
-              Name: "application-version, inputs-hash",
-            },
-          },
           Action: func(context *cli.Context) error {
-            return createChart(context, repository)
+            return createChart(context, application, repository)
           },
         },
         {
           Name: "upload",
           Usage: "knega chart upload, uploads chart to helm repository (only works for git based repositories currently)",
-          Flags: []cli.Flag{
-            cli.StringFlag{
-              Name: "application-version, inputs-hash",
-            },
-          },
           Action: func(context *cli.Context) error {
             return uploadChart(context, application, repository)
           },
@@ -106,6 +84,33 @@ func main() {
           Usage: "knega chart update-index, updates repository index (done seperately to avoid conflicts while pushing",
           Action: func(context *cli.Context) error {
             return updateHelmIndex(context, repository)
+          },
+        },
+      },
+    },
+    {
+      Name: "docker",
+      Usage: "docker <action> handles docker actions like create and upload",
+      Subcommands: []cli.Command{
+        {
+          Name: "upload",
+          Usage: "knega docker upload, tags and uploads docker image to repository",
+          Flags: []cli.Flag{
+            cli.StringFlag{
+              Name: "docker-username",
+              Value: "",
+              Usage: "Username used by docker login",
+              EnvVar: "KNEGA_DOCKER_USERNAME",
+            },
+            cli.StringFlag{
+              Name: "docker-password",
+              Value: "",
+              Usage: "Password used by docker login",
+              EnvVar: "KNEGA_DOCKER_PASSWORD",
+            },
+          },
+          Action: func(context *cli.Context) error {
+            return dockerUpload(context, application, repository)
           },
         },
       },

@@ -128,3 +128,11 @@ func convertFileContentToLowerCase(path string) {
 
   err = ioutil.WriteFile(path, lowerCaseContent, 0777)
 }
+
+func readFile(path string) string {
+  output, err := ioutil.ReadFile(path)
+  if err != nil {
+    log.Fatal(err)
+  }
+  return string(output[:])
+}
