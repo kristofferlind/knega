@@ -5,6 +5,7 @@ import (
   "fmt"
 
   "github.com/spf13/viper"
+  "github.com/urfave/cli"
 )
 
 type Repository struct {
@@ -17,9 +18,11 @@ type Repository struct {
   baseChartPath string
   helmRepositoryCloneURL string
   dockerRepository string
+  dockerRepositoryUsername string
+  dockerRepositoryPassword string
 }
 
-func initializeRepository(shouldIncludeApplications bool) Repository {
+func initializeRepository(cliContext *cli.Context, shouldIncludeApplications bool) Repository {
   workingDirectory := getWorkingDirectory()
   repositoryPath := findParentDirectoryWithFile(workingDirectory, ".knega.root.toml")
 
@@ -37,11 +40,13 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
     searchDepth: viper.GetInt("applicationSearchDepth"),
     helmRepositoryCloneURL: viper.GetString("helmRepositoryCloneURL"),
     dockerRepository: viper.GetString("dockerRepository"),
+    dockerRepositoryUsername: cliContext.String("docker-username"),
+    dockerRepositoryPassword: cliContext.String("docker-password"),
   }
 
   if shouldIncludeApplications {
     directoriesExist(repository.searchDirectories)
-    repository.applications = getApplications(repository)
+    repository.applications = getApplications(cliContext, repository)
   }
 
   // log.Printf("Initialized repository %s", repository.path)
@@ -49,12 +54,12 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
   return repository
 }
 
-func getApplications(repository Repository) []Application {
+func getApplications(cliContext *cli.Context, repository Repository) []Application {
   var results []Application
   for _, searchFolder := range repository.searchDirectories {
     applicationConfigPaths := findSubDirectoriesWithFile(searchFolder, ".app.toml", repository.searchDepth)
     for _, applicationConfigPath := range applicationConfigPaths {
-      application := initializeApplication(applicationConfigPath)
+      application := initializeApplication(cliContext, applicationConfigPath)
       results = append(results, application)
       log.Printf("%s: %s", application.name, application.inputsHash)
     }

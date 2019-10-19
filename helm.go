@@ -20,7 +20,7 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
   repositoryName := "helm-repo"
   helmRepositoryPath := path.Join(repository.path, ".generated/", repositoryName)
   if ! directoryExists(helmRepositoryPath) {
-    repositoryURL := "git@github.com:Modity/HelmRepository.git" //repository.outputs.chart.path
+    repositoryURL := repository.helmRepositoryCloneURL
     log.Print(gitCloneRepository(repositoryURL, repositoryName, generatedPath))
   }
 

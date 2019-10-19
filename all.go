@@ -67,9 +67,9 @@ func pipelineResults(results <-chan string, done chan<- bool, startTime time.Tim
   done <- true
 }
 
-func all(c *cli.Context, action string) error {
+func all(cliContext *cli.Context, action string) error {
   startTime := time.Now()
-  repository := initializeRepository(true)
+  repository := initializeRepository(cliContext, true)
   var jobs []Job
   for _, application := range repository.applications {
     job := createJob(repository, application, action)
@@ -81,7 +81,7 @@ func all(c *cli.Context, action string) error {
 
   results := make(chan string, len(jobs))
 
-  go pipelineResults(results, done, startTime, len(jobs), false)
+  go pipelineResults(results, done, startTime, len(jobs), true)
   createWorkerPipeline(jobs, results)
 
   <-done
@@ -93,9 +93,9 @@ func all(c *cli.Context, action string) error {
   return nil
 }
 
-func changed(c *cli.Context, action string) error {
+func changed(cliContext *cli.Context, action string) error {
   startTime := time.Now()
-  repository := initializeRepository(true)
+  repository := initializeRepository(cliContext, true)
   var jobs []Job
   for _, application := range repository.applications {
     if application.hasChanges() {

@@ -2,7 +2,9 @@ package main
 
 import (
   "log"
-	"context"
+  "context"
+  "encoding/json"
+  "encoding/base64"
 
   "github.com/urfave/cli"
 	"docker.io/go-docker"
@@ -29,10 +31,10 @@ func dockerUpload(cliContext *cli.Context, application Application, repository R
   return nil
 }
 
-func dockerImageExists(imageName string, imageTag string, application *Application) bool {
+func dockerImageExistsOther(imageName string, imageTag string, application *Application) bool {
   username := ""
   password := ""
-  registryURL := application.repository.dockerRepository + "/" + imageName
+  registryURL := "https://" + application.repository.dockerRepository + "/" + imageName
 
   hub, err := registry.New(registryURL, username, password, log.Printf)
 	if err != nil {
@@ -52,41 +54,30 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
   return false
 }
 
-func dockerImageExistsGoDocker(imageName string, imageTag string, application *Application) bool {
+func dockerImageExists(imageName string, imageTag string, application *Application) bool {
   context := context.Background()
   cli, err := docker.NewEnvClient()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	authConfig := types.AuthConfig{
-		Username: "",
-    Password: "",
-    Auth: "basic",
-    ServerAddress: application.repository.dockerRepository, // + "/" + application.name,
-  }
+  inspectAuthConfig := types.AuthConfig{
+		Username: application.repository.dockerRepositoryUsername,
+    Password: application.repository.dockerRepositoryPassword,
+	}
+	encodedJSON, err := json.Marshal(inspectAuthConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 
-  loginResult, loginErr := cli.RegistryLogin(context, authConfig)
-  if loginErr != nil {
-    log.Fatal(loginErr)
-  }
-  log.Print(loginResult)
-
-  searchOptions := types.ImageSearchOptions{
-    Limit: 10,
-  }
-
-  searchResults, searchError := cli.ImageSearch(context, "", searchOptions)
-  if searchError != nil {
-    log.Fatal(searchError)
-  }
-  log.Print(searchResults)
-
-  inspect, inspectErr := cli.DistributionInspect(context, "image", "")
+  fullImagePath := application.repository.dockerRepository + "/" + imageName + ":" + imageTag
+  inspect, inspectErr := cli.DistributionInspect(context, fullImagePath, authStr)
   if inspectErr != nil {
-    log.Fatal(inspectErr)
+    log.Print(inspectErr)
+    return false
   }
-  log.Print(inspect)
+  log.Printf("Found iamge %s at %s", inspect.Descriptor.Digest, fullImagePath)
 
-  return false
+  return true
 }

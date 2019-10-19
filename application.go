@@ -6,6 +6,8 @@ import (
   "log"
   "crypto/sha512"
   "encoding/hex"
+
+  "github.com/urfave/cli"
 )
 
 type Application struct {
@@ -23,7 +25,7 @@ type Application struct {
   repository Repository
 }
 
-func initializeApplication(applicationPath string) Application {
+func initializeApplication(cliContext *cli.Context, applicationPath string) Application {
   applicationConfiguration := getApplicationConfiguration(applicationPath)
 
   application := Application{
@@ -48,7 +50,7 @@ func initializeApplication(applicationPath string) Application {
   application.commands.release = applicationConfiguration.commands.release
 
   shouldInitializeApplications := false
-  application.repository = initializeRepository(shouldInitializeApplications)
+  application.repository = initializeRepository(cliContext, shouldInitializeApplications)
 
   return application
 }

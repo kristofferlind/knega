@@ -19,15 +19,11 @@ func main() {
   // so have applications hold a reference to repository rather than the other way around
   // then single application commands should get single application and all commands should get an array of applications
   // for now just get from repository
-  repository := initializeRepository(false)
 
-  var application Application
-  currentWorkingDirectory := getWorkingDirectory()
-  log.Print(path.Clean(currentWorkingDirectory))
-  log.Print(path.Clean(repository.path))
-  if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
-    application = initializeApplication(currentWorkingDirectory)
-  }
+  /*
+    TODO: if currentDirectory has appconfig, initializeApplication
+    if rootConfig is found initialize repository at application.repository
+  */
 
   app.Commands = []cli.Command{
     {
@@ -58,22 +54,40 @@ func main() {
         {
           Name: "create",
           Usage: "knega chart create, creates chart based on app configuration",
-          Action: func(context *cli.Context) error {
-            return createChart(context, application, repository)
+          Action: func(cliContext *cli.Context) error {
+            repository := initializeRepository(cliContext, false)
+            var application Application
+            currentWorkingDirectory := getWorkingDirectory()
+
+            if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+              application = initializeApplication(cliContext, currentWorkingDirectory)
+            }
+
+            return createChart(cliContext, application, repository)
           },
         },
         {
           Name: "upload",
           Usage: "knega chart upload, uploads chart to helm repository (only works for git based repositories currently)",
-          Action: func(context *cli.Context) error {
-            return uploadChart(context, application, repository)
+          Action: func(cliContext *cli.Context) error {
+            repository := initializeRepository(cliContext, false)
+            var application Application
+            currentWorkingDirectory := getWorkingDirectory()
+
+            if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+              application = initializeApplication(cliContext, currentWorkingDirectory)
+            }
+
+            return uploadChart(cliContext, application, repository)
           },
         },
         {
           Name: "update-index",
           Usage: "knega chart update-index, updates repository index (done seperately to avoid conflicts while pushing",
-          Action: func(context *cli.Context) error {
-            return updateHelmIndex(context, repository)
+          Action: func(cliContext *cli.Context) error {
+            repository := initializeRepository(cliContext, false)
+
+            return updateHelmIndex(cliContext, repository)
           },
         },
       },
@@ -99,8 +113,16 @@ func main() {
               EnvVar: "KNEGA_DOCKER_PASSWORD",
             },
           },
-          Action: func(context *cli.Context) error {
-            return dockerUpload(context, application, repository)
+          Action: func(cliContext *cli.Context) error {
+            repository := initializeRepository(cliContext, false)
+            var application Application
+            currentWorkingDirectory := getWorkingDirectory()
+
+            if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+              application = initializeApplication(cliContext, currentWorkingDirectory)
+            }
+
+            return dockerUpload(cliContext, application, repository)
           },
         },
       },
@@ -142,6 +164,20 @@ func main() {
     {
       Name: "changed",
       Usage: "changed <action> will run action for all applications with changes",
+      Flags: []cli.Flag{
+        cli.StringFlag{
+          Name: "docker-username",
+          Value: "",
+          Usage: "Username used by docker login",
+          EnvVar: "KNEGA_DOCKER_USERNAME",
+        },
+        cli.StringFlag{
+          Name: "docker-password",
+          Value: "",
+          Usage: "Password used by docker login",
+          EnvVar: "KNEGA_DOCKER_PASSWORD",
+        },
+      },
       Subcommands: []cli.Command{
         {
           Name:  "check",
