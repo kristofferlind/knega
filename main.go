@@ -29,16 +29,6 @@ func main() {
     application = initializeApplication(currentWorkingDirectory)
   }
 
-  // app.Flags = []cli.Flag {
-  //   cli.StringFlag{
-  //     Name: "application-version",
-  //     Value: "",
-  //     Usage: "Version tag to be used for build/create-chart commands",
-  //   },
-  // }
-  //
-  // log.Print(app.String("application-version"))
-
   app.Commands = []cli.Command{
     {
       Name:  "build",
@@ -116,9 +106,8 @@ func main() {
       },
     },
     {
-      // maybe have all/changed?
       Name: "all",
-      Usage: "all <action> will run action for all applications with changes",
+      Usage: "all <action> will run action for all applications",
       Subcommands: []cli.Command{
         {
           Name:  "check",
@@ -146,6 +135,40 @@ func main() {
           Usage: "Run release command in all applications, passing in $INPUTS_HASH",
           Action: func(context *cli.Context) error {
             return all(context, "release")
+          },
+        },
+      },
+    },
+    {
+      Name: "changed",
+      Usage: "changed <action> will run action for all applications with changes",
+      Subcommands: []cli.Command{
+        {
+          Name:  "check",
+          Usage: "Run build command defined in application configs where changes have occurred",
+          Action: func(c *cli.Context) error {
+            return changed(c, "check")
+          },
+        },
+        {
+          Name:  "build",
+          Usage: "Run build command defined in application configs where changes have occurred",
+          Action: func(context *cli.Context) error {
+            return changed(context, "build")
+          },
+        },
+        {
+          Name:  "analyze",
+          Usage: "Run analyze command defined in application configs where changes have occurred",
+          Action: func(context *cli.Context) error {
+            return changed(context, "analyze")
+          },
+        },
+        {
+          Name:  "release",
+          Usage: "Run release command in all applications, passing in $INPUTS_HASH",
+          Action: func(context *cli.Context) error {
+            return changed(context, "release")
           },
         },
       },

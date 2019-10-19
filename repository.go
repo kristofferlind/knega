@@ -44,7 +44,7 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
     repository.applications = getApplications(repository)
   }
 
-  log.Printf("Initialized repository %s", repository.path)
+  // log.Printf("Initialized repository %s", repository.path)
 
   return repository
 }

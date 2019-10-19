@@ -83,7 +83,7 @@ func findParentDirectoryWithFile(directory string, filename string) string {
       }
 
       directoryPath := strings.Replace(absolutePath, filename, "", 1)
-      log.Print("Found root directory: " + directoryPath)
+      // log.Print("Found root directory: " + directoryPath)
 
       return directoryPath
     }

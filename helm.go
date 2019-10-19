@@ -27,6 +27,8 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
   commitMessage := "re-index"
   log.Print(createHelmRepositoryIndex(helmRepositoryPath))
   log.Print(gitCommit(commitMessage, helmRepositoryPath))
+
+  // TODO: need a retry here.. probably for the clone aswell
   err := gitPush(helmRepositoryPath)
 
   if err != nil {
@@ -34,4 +36,8 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
   }
 
   return nil
+}
+
+func helmPackageExists(packageName string, packageVersion string, application *Application) bool {
+  return true
 }

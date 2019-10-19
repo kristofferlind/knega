@@ -92,3 +92,31 @@ func all(c *cli.Context, action string) error {
 
   return nil
 }
+
+func changed(c *cli.Context, action string) error {
+  startTime := time.Now()
+  repository := initializeRepository(true)
+  var jobs []Job
+  for _, application := range repository.applications {
+    if application.hasChanges() {
+      job := createJob(repository, application, action)
+      jobs = append(jobs, job)
+    }
+  }
+
+  done := make(chan bool, 1)
+  defer close(done)
+
+  results := make(chan string, len(jobs))
+
+  go pipelineResults(results, done, startTime, len(jobs), false)
+  createWorkerPipeline(jobs, results)
+
+  <-done
+
+  endTime := time.Now()
+  timeTaken := endTime.Sub(startTime)
+  log.Printf("Total time taken: %s", timeTaken)
+
+  return nil
+}

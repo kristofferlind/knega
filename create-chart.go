@@ -39,8 +39,31 @@ func createChart(cliContext *cli.Context, application Application, repository Re
     }
   }
 
+  if fileExists("deploy-values.yml") {
+    err := copy.Copy("deploy-values.yml", ".generated/deploy-values.yml")
+    if err != nil {
+      log.Fatal(err)
+    }
+  } else {
+    os.Create(".generated/deploy-values.yml")
+  }
+
   // load
   defaultValues := viper.New()
+  defaultValues.SetConfigName("values")
+  defaultValues.AddConfigPath("./.generated/default-app") // change to new chart name
+  err := defaultValues.ReadInConfig()
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  defaultValues.SetConfigName("deploy-values")
+  defaultValues.AddConfigPath(".generated")
+  err = defaultValues.MergeInConfig()
+  if err != nil {
+    log.Fatal(err)
+  }
+
   defaultValues.SetConfigName("values")
   defaultValues.AddConfigPath("./.generated/default-app") // change to new chart name
 
@@ -49,10 +72,6 @@ func createChart(cliContext *cli.Context, application Application, repository Re
   // lets try rewriting all files to lowercase for now, done at the end
   // defaultValues.SetKeysCaseSensitive(true)
 
-  err := defaultValues.ReadInConfig()
-  if err != nil {
-    log.Fatal(err)
-  }
   appConfig := viper.New()
   appConfig.SetConfigName(".app")
   appConfig.AddConfigPath(".")
@@ -111,23 +130,5 @@ func createChart(cliContext *cli.Context, application Application, repository Re
     log.Fatal(commandError)
   }
 
-  /* All values set in deploy-values.yaml needs to overwrite those values in defaultValues, then skip that file in artifacts */
-  if fileExists("deploy-values.yml") {
-    err := copy.Copy("deploy-values.yml", ".generated/deploy-values.yml")
-    if err != nil {
-      log.Fatal(err)
-    }
-  } else {
-    os.Create(".generated/deploy-values.yml")
-  }
-
   return nil
 }
-
-
-
-/*
-upload chart
-
-replicate scripts/upload.sh
-*/

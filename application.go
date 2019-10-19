@@ -20,6 +20,7 @@ type Application struct {
     analyze []string
     release []string
   }
+  repository Repository
 }
 
 func initializeApplication(applicationPath string) Application {
@@ -45,6 +46,9 @@ func initializeApplication(applicationPath string) Application {
   application.commands.build = applicationConfiguration.commands.build
   application.commands.analyze = applicationConfiguration.commands.analyze
   application.commands.release = applicationConfiguration.commands.release
+
+  shouldInitializeApplications := false
+  application.repository = initializeRepository(shouldInitializeApplications)
 
   return application
 }
@@ -108,6 +112,17 @@ func generateInputsHash (inputs []BuildInput) string {
 }
 
 func (application *Application) hasChanges() bool {
-  // check if output artifacts exist (where uploaded) for that specific hash
-  return true
+  packageName := application.name
+  packageVersion := "1.0.0-" + application.inputsHash
+  if ! helmPackageExists(packageName, packageVersion, application) {
+    return true
+  }
+
+  imageName := application.name
+  imageTag := application.inputsHash
+  if !dockerImageExists(imageName, imageTag, application) {
+    return true
+  }
+
+  return false
 }

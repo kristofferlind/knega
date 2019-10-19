@@ -3,6 +3,7 @@ package main
 import (
   "strings"
   "log"
+  "path/filepath"
 )
 
 // type Action func(cli.Context) error
@@ -19,6 +20,8 @@ func injectCommandVariables(rawValue string, application Application, repository
   value := strings.Replace(rawValue, "$ROOT", repository.path, -1)
   value = strings.Replace(value, "$INPUTS_HASH", application.inputsHash, -1)
   value = strings.Replace(value, "$APPLICATION_NAME", application.name, -1)
+
+  value = filepath.Clean(value)
 
   return value
 }
