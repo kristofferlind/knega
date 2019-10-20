@@ -2,15 +2,35 @@ package main
 
 import (
   "log"
+  "bytes"
 
   "github.com/spf13/viper"
 )
 
 type ApplicationConfiguration struct {
   name string
-  fileInputPatterns []string
-  gitFileInputPatterns []string
-  outputs []BuildOutput
+  inputs struct {
+    filePaths []string
+    gitFilePaths []string
+  }
+  outputs struct {
+    dockerImage struct {
+      idFile string
+      repository string
+      tag string
+      usernameEnv string
+      passwordEnv string
+    }
+    helmChart struct {
+      chartPath string
+      packageFilePath string
+      packageFileName string
+      repository string
+      usernameEnv string
+      passwordEnv string
+      repositoryGitURL string
+    }
+  }
   commands struct {
     check []string
     build []string
@@ -19,94 +39,66 @@ type ApplicationConfiguration struct {
   }
 }
 
-type BuildOutput struct {
-  outputType string
-}
+var defaultApplicationConfiguration = []byte(`
+[Input]
+[Input.GitFiles]
+  paths = ["*"]
+`)
 
-/*
-  should replace:
-  - $APPLICATION_NAME
-  - $ROOT
-  - $INPUT_HASH (needs to be done in phase after its been calculated)
-*/
-func injectVariables(value string) string {
-  //TODO: replace with all variables that can be used in configuration files
-  return value
-}
 
-func injectVariablesArray(values []string) []string {
-  var result []string
-  for _, value := range values {
-    transformedValue := injectVariables(value)
-    result = append(result, transformedValue)
-  }
-
-  return result
-}
-
-// TODO: can override functions be just one that takes multiple types?
-func handleStringSliceOverride(rootValue []string, applicationValue []string) []string {
-  if len(applicationValue) > 0 {
-    return applicationValue
-  } else {
-    return rootValue
-  }
-}
-
-func handleStringOverride(rootValue string, applicationValue string) string {
-  if applicationValue != "" {
-    return applicationValue
-  } else {
-    return rootValue
-  }
-}
-
-func getApplicationConfiguration(configurationPath string) ApplicationConfiguration {
+func getApplicationConfiguration(configurationPath string, repository Repository) ApplicationConfiguration {
   configurationFile := viper.New()
-  configurationFile.SetConfigName(".app")
-  configurationFile.AddConfigPath(configurationPath)
-  err := configurationFile.ReadInConfig()
-  if err != nil {
-    log.Fatal(err)
+  configurationFile.SetConfigType("toml")
+  configurationFile.ReadConfig(bytes.NewBuffer(defaultApplicationConfiguration))
+
+  hasRootConfig := fileExists(repository.path + "/.knega.root.toml")
+
+  if hasRootConfig {
+    configurationFile.SetConfigName(".knega.root")
+    configurationFile.AddConfigPath(repository.path)
+    err := configurationFile.MergeInConfig()
+    if err != nil {
+      log.Fatal(err)
+    }
   }
 
-  rootFileInputPatterns := configurationFile.GetStringSlice("Input.Files.patterns")
-  applicationFileInputPatterns := configurationFile.GetStringSlice("Input.Files.patterns")
-  rawFileInputPatterns := handleStringSliceOverride(rootFileInputPatterns, applicationFileInputPatterns)
-  fileInputPatterns := injectVariablesArray(rawFileInputPatterns)
+  hasApplicationConfig := fileExists(configurationPath + "/.app.toml")
 
-  rootGitInputPatterns := viper.GetStringSlice("Input.GitFiles.patterns")
-  applicationGitInputPatterns := configurationFile.GetStringSlice("Input.GitFiles.patterns")
-  rawGitFileInputPatterns := handleStringSliceOverride(rootGitInputPatterns, applicationGitInputPatterns)
-  gitFileInputPatterns := injectVariablesArray(rawGitFileInputPatterns)
-
-  rootCheckCommand := viper.GetStringSlice("Check.commands")
-  applicationCheckCommand := configurationFile.GetStringSlice("Check.commands")
-  checkCommand := handleStringSliceOverride(rootCheckCommand, applicationCheckCommand)
-
-  rootBuildCommand := viper.GetStringSlice("Build.commands")
-  applicationBuildCommand := configurationFile.GetStringSlice("Build.commands")
-  buildCommand := handleStringSliceOverride(rootBuildCommand, applicationBuildCommand)
-
-  rootAnalyzeCommand := viper.GetStringSlice("Analyze.commands")
-  applicationAnalyzeCommand := configurationFile.GetStringSlice("Analyze.commands")
-  analyzeCommand := handleStringSliceOverride(rootAnalyzeCommand, applicationAnalyzeCommand)
-
-  rootReleaseCommand := viper.GetStringSlice("Release.commands")
-  applicationReleaseCommand := configurationFile.GetStringSlice("Release.commands")
-  releaseCommand := handleStringSliceOverride(rootReleaseCommand, applicationReleaseCommand)
+  if hasApplicationConfig {
+    configurationFile.SetConfigName(".app")
+    configurationFile.AddConfigPath(configurationPath)
+    err := configurationFile.MergeInConfig()
+    if err != nil {
+      log.Fatal(err)
+    }
+  }
 
   configuration := ApplicationConfiguration{
     name: configurationFile.GetString("name"),
-    fileInputPatterns: fileInputPatterns,
-    gitFileInputPatterns: gitFileInputPatterns,
-    // outputs: []BuildOutput,
   }
 
-  configuration.commands.check = checkCommand // or default knega test
-  configuration.commands.build = buildCommand // or default knega build
-  configuration.commands.analyze = analyzeCommand // or default knega analyze (codequality, performance, dependency vulnerabilities, docker image vulnerabilities)
-  configuration.commands.release = releaseCommand // or default knega release
+  configuration.inputs.filePaths = configurationFile.GetStringSlice("Input.Files.paths")
+  configuration.inputs.gitFilePaths = configurationFile.GetStringSlice("Input.GitFiles.paths")
+
+  configuration.outputs.dockerImage.idFile = configurationFile.GetString("Output.DockerImage.idFile")
+  configuration.outputs.dockerImage.repository = configurationFile.GetString("Output.DockerImage.repository")
+  configuration.outputs.dockerImage.tag = configurationFile.GetString("Output.DockerImage.tag")
+  configuration.outputs.dockerImage.usernameEnv = "KNEGA_DOCKER_USERNAME" //configurationFile.GetString("Output.DockerImage.usernameEnv")
+  configuration.outputs.dockerImage.passwordEnv = "KNEGA_DOCKER_PASSWORD" //configurationFile.GetString("Output.DockerImage.passwordEnv")
+
+
+  configuration.outputs.helmChart.chartPath = configurationFile.GetString("Output.HelmChart.chartPath")
+  configuration.outputs.helmChart.packageFilePath = configurationFile.GetString("Output.HelmChart.packageFilePath")
+  configuration.outputs.helmChart.packageFileName = configurationFile.GetString("Output.HelmChart.packageFileName")
+  configuration.outputs.helmChart.repository = configurationFile.GetString("Output.HelmChart.repository")
+  configuration.outputs.helmChart.usernameEnv = "KNEGA_HELM_USERNAME" //configurationFile.GetString("Output.HelmChart.usernameEnv")
+  configuration.outputs.helmChart.passwordEnv = "KNEGA_HELM_PASSWORD" //configurationFile.GetString("Output.HelmChart.passwordEnv")
+  configuration.outputs.helmChart.repositoryGitURL = configurationFile.GetString("Output.HelmChart.repositoryGitURL")
+
+  configuration.commands.check = configurationFile.GetStringSlice("Check.commands")
+  configuration.commands.build = configurationFile.GetStringSlice("Build.commands")
+  configuration.commands.analyze = configurationFile.GetStringSlice("Analyze.commands")
+  configuration.commands.release = configurationFile.GetStringSlice("Release.commands")
 
   return configuration
 }

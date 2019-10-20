@@ -5,8 +5,6 @@ import (
   "log"
   "time"
   "sync"
-
-  "github.com/urfave/cli"
 )
 
 // maybe just include output when error?
@@ -67,9 +65,9 @@ func pipelineResults(results <-chan string, done chan<- bool, startTime time.Tim
   done <- true
 }
 
-func all(cliContext *cli.Context, action string) error {
+func all(action string) error {
   startTime := time.Now()
-  repository := initializeRepository(cliContext, true)
+  repository := initializeRepository(true)
   var jobs []Job
   for _, application := range repository.applications {
     job := createJob(repository, application, action)
@@ -93,9 +91,9 @@ func all(cliContext *cli.Context, action string) error {
   return nil
 }
 
-func changed(cliContext *cli.Context, action string) error {
+func changed(action string) error {
   startTime := time.Now()
-  repository := initializeRepository(cliContext, true)
+  repository := initializeRepository(true)
   var jobs []Job
   for _, application := range repository.applications {
     if application.hasChanges() {

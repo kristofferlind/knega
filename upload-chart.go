@@ -10,22 +10,21 @@ import (
   "github.com/urfave/cli"
 )
 
-// TODO: need to pass in application
-func uploadChart(context *cli.Context, application Application, repository Repository) error {
-  generatedPath := path.Join(repository.path, ".generated")
+func uploadChart(context *cli.Context, application Application) error {
+  generatedPath := path.Join(application.repository.path, ".generated")
   if ! directoryExists(generatedPath) {
     os.Mkdir(generatedPath, 0777)
   }
 
   // do one repository per application to minimze conflicts
   repositoryName := application.name + "-repo"
-  helmRepositoryPath := path.Join(repository.path, ".generated/", repositoryName)
+  helmRepositoryPath := path.Join(application.repository.path, ".generated/", repositoryName)
   if ! directoryExists(helmRepositoryPath) {
-    repositoryURL := repository.helmRepositoryCloneURL
+    repositoryURL := application.helm.repositoryGitURL
     log.Print(gitCloneRepository(repositoryURL, repositoryName, generatedPath))
   }
-  packageFileName := application.name + "-1.0.0-" + application.inputsHash + ".tgz"
-  packagePath := path.Join(".generated/", packageFileName)
+  packageFileName := application.helm.packageFileName
+  packagePath := path.Join(application.helm.packageFilePath, packageFileName)
 
   packageDestinationDirectory := path.Join(helmRepositoryPath, "charts")
   if ! directoryExists(packageDestinationDirectory) {

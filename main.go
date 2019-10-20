@@ -55,12 +55,12 @@ func main() {
           Name: "create",
           Usage: "knega chart create, creates chart based on app configuration",
           Action: func(cliContext *cli.Context) error {
-            repository := initializeRepository(cliContext, false)
+            repository := initializeRepository(false)
             var application Application
             currentWorkingDirectory := getWorkingDirectory()
 
             if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
-              application = initializeApplication(cliContext, currentWorkingDirectory)
+              application = initializeApplication(currentWorkingDirectory)
             }
 
             return createChart(cliContext, application, repository)
@@ -70,22 +70,22 @@ func main() {
           Name: "upload",
           Usage: "knega chart upload, uploads chart to helm repository (only works for git based repositories currently)",
           Action: func(cliContext *cli.Context) error {
-            repository := initializeRepository(cliContext, false)
+            repository := initializeRepository(false)
             var application Application
             currentWorkingDirectory := getWorkingDirectory()
 
             if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
-              application = initializeApplication(cliContext, currentWorkingDirectory)
+              application = initializeApplication(currentWorkingDirectory)
             }
 
-            return uploadChart(cliContext, application, repository)
+            return uploadChart(cliContext, application)
           },
         },
         {
           Name: "update-index",
           Usage: "knega chart update-index, updates repository index (done seperately to avoid conflicts while pushing",
           Action: func(cliContext *cli.Context) error {
-            repository := initializeRepository(cliContext, false)
+            repository := initializeRepository(false)
 
             return updateHelmIndex(cliContext, repository)
           },
@@ -114,15 +114,15 @@ func main() {
             },
           },
           Action: func(cliContext *cli.Context) error {
-            repository := initializeRepository(cliContext, false)
+            repository := initializeRepository(false)
             var application Application
             currentWorkingDirectory := getWorkingDirectory()
 
             if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
-              application = initializeApplication(cliContext, currentWorkingDirectory)
+              application = initializeApplication(currentWorkingDirectory)
             }
 
-            return dockerUpload(cliContext, application, repository)
+            return dockerUpload(cliContext, application)
           },
         },
       },
@@ -135,28 +135,28 @@ func main() {
           Name:  "check",
           Usage: "Run build command defined in application configs where changes have occurred",
           Action: func(c *cli.Context) error {
-            return all(c, "check")
+            return all("check")
           },
         },
         {
           Name:  "build",
           Usage: "Run build command defined in application configs where changes have occurred",
           Action: func(context *cli.Context) error {
-            return all(context, "build")
+            return all("build")
           },
         },
         {
           Name:  "analyze",
           Usage: "Run analyze command defined in application configs where changes have occurred",
           Action: func(context *cli.Context) error {
-            return all(context, "analyze")
+            return all("analyze")
           },
         },
         {
           Name:  "release",
           Usage: "Run release command in all applications, passing in $INPUTS_HASH",
           Action: func(context *cli.Context) error {
-            return all(context, "release")
+            return all("release")
           },
         },
       },
@@ -183,28 +183,28 @@ func main() {
           Name:  "check",
           Usage: "Run build command defined in application configs where changes have occurred",
           Action: func(c *cli.Context) error {
-            return changed(c, "check")
+            return changed("check")
           },
         },
         {
           Name:  "build",
           Usage: "Run build command defined in application configs where changes have occurred",
           Action: func(context *cli.Context) error {
-            return changed(context, "build")
+            return changed("build")
           },
         },
         {
           Name:  "analyze",
           Usage: "Run analyze command defined in application configs where changes have occurred",
           Action: func(context *cli.Context) error {
-            return changed(context, "analyze")
+            return changed("analyze")
           },
         },
         {
           Name:  "release",
           Usage: "Run release command in all applications, passing in $INPUTS_HASH",
           Action: func(context *cli.Context) error {
-            return changed(context, "release")
+            return changed("release")
           },
         },
       },

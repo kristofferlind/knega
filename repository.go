@@ -5,24 +5,20 @@ import (
   "fmt"
 
   "github.com/spf13/viper"
-  "github.com/urfave/cli"
 )
 
 type Repository struct {
   path string
   searchDirectories []string
   searchDepth int
-  // commitId string
-  // isWorkTreeDirty bool
   applications []Application
   baseChartPath string
-  helmRepositoryCloneURL string
-  dockerRepository string
-  dockerRepositoryUsername string
-  dockerRepositoryPassword string
+  helm struct{
+    repositoryGitURL string
+  }
 }
 
-func initializeRepository(cliContext *cli.Context, shouldIncludeApplications bool) Repository {
+func initializeRepository(shouldIncludeApplications bool) Repository {
   workingDirectory := getWorkingDirectory()
   repositoryPath := findParentDirectoryWithFile(workingDirectory, ".knega.root.toml")
 
@@ -38,15 +34,14 @@ func initializeRepository(cliContext *cli.Context, shouldIncludeApplications boo
     baseChartPath: repositoryPath + viper.GetString("baseChartPath"),
     searchDirectories: viper.GetStringSlice("applicationPaths"),
     searchDepth: viper.GetInt("applicationSearchDepth"),
-    helmRepositoryCloneURL: viper.GetString("helmRepositoryCloneURL"),
-    dockerRepository: viper.GetString("dockerRepository"),
-    dockerRepositoryUsername: cliContext.String("docker-username"),
-    dockerRepositoryPassword: cliContext.String("docker-password"),
   }
+
+  // TODO: do update as part of chart upload instead, make it a job that runs for one of the applications once all workers are done
+  repository.helm.repositoryGitURL = viper.GetString("Output.HelmChart.repositoryGitURL")
 
   if shouldIncludeApplications {
     directoriesExist(repository.searchDirectories)
-    repository.applications = getApplications(cliContext, repository)
+    repository.applications = getApplications(repository)
   }
 
   // log.Printf("Initialized repository %s", repository.path)
@@ -54,12 +49,12 @@ func initializeRepository(cliContext *cli.Context, shouldIncludeApplications boo
   return repository
 }
 
-func getApplications(cliContext *cli.Context, repository Repository) []Application {
+func getApplications(repository Repository) []Application {
   var results []Application
   for _, searchFolder := range repository.searchDirectories {
     applicationConfigPaths := findSubDirectoriesWithFile(searchFolder, ".app.toml", repository.searchDepth)
     for _, applicationConfigPath := range applicationConfigPaths {
-      application := initializeApplication(cliContext, applicationConfigPath)
+      application := initializeApplication(applicationConfigPath)
       results = append(results, application)
       log.Printf("%s: %s", application.name, application.inputsHash)
     }

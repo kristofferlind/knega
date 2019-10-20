@@ -20,7 +20,7 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
   repositoryName := "helm-repo"
   helmRepositoryPath := path.Join(repository.path, ".generated/", repositoryName)
   if ! directoryExists(helmRepositoryPath) {
-    repositoryURL := repository.helmRepositoryCloneURL
+    repositoryURL := repository.helm.repositoryGitURL
     log.Print(gitCloneRepository(repositoryURL, repositoryName, generatedPath))
   }
 
@@ -39,5 +39,22 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
 }
 
 func helmPackageExists(packageName string, packageVersion string, application *Application) bool {
+  addRepoCommand := "helm repo add --username " + application.helm.username
+  addRepoCommand += " --password " + application.helm.password
+  addRepoCommand += " knega-repo " + application.helm.repository
+  executeCommand(addRepoCommand, application.path)
+
+  executeCommand("helm repo update", application.path)
+
+  searchCommand := "helm search --version 1.0.0-" + application.inputsHash
+  searchCommand += " knega-repo/" + application.name
+  result := executeCommand(searchCommand, application.path)
+
+  if result == "No results found" {
+    return false
+  }
+
+  log.Printf("Found existing chart in these results: %s", result)
+
   return true
 }
