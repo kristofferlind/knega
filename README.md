@@ -19,6 +19,8 @@ Tool has help sections describing all the different actions, overview found by r
 
 ### Examples
 #### Monorepo actions
+Example configurations can be found in examples/, .knega.root.toml should be at project root and .app.toml should exist for every application
+
 Command | Action
 --- | ---
 `knega changed <action>` | runs action for applications with changes (based on hash of inputs, checks whether image & chart with that hash already exists)
