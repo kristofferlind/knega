@@ -8,17 +8,17 @@ applicationPaths = ["applications", "libraries", "infrastructure"]
 applicationSearchDepth = 2
 
 # Worker settings (parallellization is done per app, so no use having more workers than apps)
-[Workers]
+# [Workers]
   # Defaults to number of cpu threads available
-  count = 8
+  # count = 8
 
 # Not implemented (will it ever be?)
 # Remote worker settings (amount of simultaneous jobs to be executed on kubernetes cluster)
-[RemoteWorkers]
-  # Remote workers are disabled by default
-  count = 0
-  kube_config_path = ""
-  kube_context = ""
+# [RemoteWorkers]
+#   # Remote workers are disabled by default
+#   count = 0
+#   kube_config_path = ""
+#   kube_context = ""
 
 # Default configuration (used by applications, can be overwritten by app configuration)
 
@@ -53,16 +53,13 @@ applicationSearchDepth = 2
     # usernameEnv = "KNEGA_HELM_USERNAME"
     # passwordEnv = "KNEGA_HELM_PASSWORD"
 
-# knega all check
+# All commands are run with application directory as working directory, root scripts can be run using $ROOT
 [Check]
-  # working directory: application directory, can run scripts from root using $ROOT_PATH
   commands = [
     "knega test"
   ]
 
-# knega all build
 [Build]
-  # working directory: application directory, can run scripts from root using $ROOT_PATH
   commands = [
     "knega build",
     "knega chart create",
@@ -70,12 +67,7 @@ applicationSearchDepth = 2
     "knega chart upload"
   ]
 
-# knega all analyze
 [Analyze]
-  # The way I plan on using this is for checks where someone needs to examine the result for it to be worth the compute time
-  # and have this action be manually triggered
-  onlyChanged = false
-  # working directory: application directory, can run scripts from root using $ROOT_PATH
   commands = [
     "knega code-quality",
     "knega dependency-vulnerability",
@@ -84,12 +76,7 @@ applicationSearchDepth = 2
     "knega generate-report-bundle"
   ]
 
-# knega all release
 [Release]
-  onlyChanged = false
-  # Will run for all applications, regardless of whether it had changes
-  # working directory: application directory, can run scripts from root using $ROOT_PATH
-  # $INPUTS_HASH is available
   commands = [
     "$ROOT/scripts/release.sh -a $APPLICATION_NAME -h $INPUTS_HASH"
     # "knega release"
