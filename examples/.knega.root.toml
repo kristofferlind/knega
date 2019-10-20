@@ -1,14 +1,7 @@
-###
-#   IMPORTANT! For now the following is just thoughts on how it should work
-###
-
-# Used by knega create-chart action, can be overwritten by chartPath in application config
-# If neither is set will use Gitlabs auto-deploy-app chart (https://gitlab.com/gitlab-org/charts/auto-deploy-app/)
+# Note: this also includes thoughts on how it should work, not everything is implemented yet
+# Used by knega create-chart action, can be overwritten by chartPath in application config (not implemented)
+# If neither is set will use Gitlabs auto-deploy-app chart (https://gitlab.com/gitlab-org/charts/auto-deploy-app/) (not implemented)
 baseChartPath = "shared/chart"
-
-# these are currently used rather than outputs to skip working out details of outputs for now, will be removed
-helmRepositoryCloneURL = ""
-dockerRepository = "repository.example.com/"
 
 # Defines where to look for applications
 applicationPaths = ["applications", "libraries", "infrastructure"]
@@ -19,6 +12,7 @@ applicationSearchDepth = 2
   # Defaults to number of cpu threads available
   count = 8
 
+# Not implemented (will it ever be?)
 # Remote worker settings (amount of simultaneous jobs to be executed on kubernetes cluster)
 [RemoteWorkers]
   # Remote workers are disabled by default
@@ -29,27 +23,35 @@ applicationSearchDepth = 2
 # Default configuration (used by applications, can be overwritten by app configuration)
 
 # Defines how to check for changes, a hash will be created based on the content of input files
+# input paths have $ROOT and $APPLICATION_NAME variable available and are relative to application directory
 [Input]
   [Input.Files]
-    patterns = ["$ROOT/.knega.root.toml"]
+    paths = ["$ROOT/.knega.root.toml"]
 
   [Input.GitFiles]
     # git ls-files <pattern> (in application directory)
-    patterns = ["*"]
-
+    paths = ["*"]
+# everything below has $ROOT, $INPUTS_HASH, $APPLICATION_NAME variables available
 [Output]
   [Output.DockerImage]
     # Path of idfile (docker build --iidfile)
     idfile = "container.id"
     # Repository to check whether it was already built or to upload to
-    repository = "repository.example.com/$APPLICATION_NAME"
+    repository = "some-registry.com/some-category/$APPLICATION_NAME"
     tag = "$INPUTS_HASH"
+    # Which environment variables to grab username/password from
+    # below are hardcoded for now
+    # usernameEnv = "KNEGA_DOCKER_USERNAME"
+    # passwordEnv = "KNEGA_DOCKER_PASSWORD"
 
   [Output.HelmChart]
-    packageFilePath = "."
-    packageFileName = "$APPLICATION_NAME-$INPUTS_HASH.tgz"
-    repository = ""
-    git = ""
+    packageFilePath = ".generated"
+    packageFileName = "$APPLICATION_NAME-1.0.0-$INPUTS_HASH.tgz"
+    repository = "https://raw.githubusercontent.com/user/repository/master"
+    repositoryGitURL = "git@github.com:user/repository.git"
+    # below are hardcoded for now
+    # usernameEnv = "KNEGA_HELM_USERNAME"
+    # passwordEnv = "KNEGA_HELM_PASSWORD"
 
 # knega all check
 [Check]
@@ -89,5 +91,6 @@ applicationSearchDepth = 2
   # working directory: application directory, can run scripts from root using $ROOT_PATH
   # $INPUTS_HASH is available
   commands = [
-    "knega release"
+    "$ROOT/scripts/release.sh -a $APPLICATION_NAME -h $INPUTS_HASH"
+    # "knega release"
   ]

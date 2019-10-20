@@ -38,11 +38,6 @@ func main() {
       Action: test,
     },
     {
-      Name:  "pipeline",
-      Usage: "Checks for Taskfile.yml, if present run that, otherwise run default",
-      Action: pipeline,
-    },
-    {
       Name:  "release",
       Usage: "Deploy",
       Action: test,
@@ -96,6 +91,11 @@ func main() {
       Name: "docker",
       Usage: "docker <action> handles docker actions like create and upload",
       Subcommands: []cli.Command{
+        {
+          Name:  "create",
+          Usage: "Builds application (uses dockerfile if it exists, otherwise tries herokuish)",
+          Action: build,
+        },
         {
           Name: "upload",
           Usage: "knega docker upload, tags and uploads docker image to repository",
