@@ -47,12 +47,12 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 
   fullImagePath := application.docker.repository + ":" + imageTag
-  inspect, inspectErr := cli.DistributionInspect(context, fullImagePath, authStr)
+  _, inspectErr := cli.DistributionInspect(context, fullImagePath, authStr)
   if inspectErr != nil {
     log.Print(inspectErr)
     return false
   }
-  log.Printf("Found image %s at %s", inspect.Descriptor.Digest, fullImagePath)
+  log.Printf("%s: Found existing docker image", application.name)
 
   return true
 }
