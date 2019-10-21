@@ -6,7 +6,7 @@ Tool has help sections describing all the different actions, overview found by r
 
 ### Examples
 #### Monorepo actions
-Example configurations can be found in examples/, .knega.root.toml should be at project root and .app.toml should exist for every application
+Example configurations can be found in [examples/](./examples), [.knega.root.toml](./examples/.knega.root.toml) should be at project root and [.app.toml](./examples/.app.toml) should exist for every application
 
 Command | Action
 --- | ---
