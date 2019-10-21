@@ -1,5 +1,5 @@
 # Knega
-CLI tool for commonly used generic CI/CD steps (analyze, build and deploy actions)
+CLI tool for commonly used generic CI/CD steps (analyze, build and deploy actions) and monorepo actions.
 
 ## Usage
 Tool has help sections describing all the different actions, overview found by running `knega`
