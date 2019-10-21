@@ -14,7 +14,7 @@ func executeCommand(command string, directory string) string {
   commandExecutor := exec.Command(commandParts[0], commandParts[1:]...)
   commandExecutor.Dir = directory
 
-  log.Printf("Executing command: %s in %s", command, directory)
+  // log.Printf("Executing command: %s in %s", command, directory)
 
   logReader, initErr := commandExecutor.StdoutPipe()
   if initErr != nil {

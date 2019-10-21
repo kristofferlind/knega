@@ -4,6 +4,7 @@ import (
   "path"
   "os"
   "log"
+  "strings"
 
   "github.com/urfave/cli"
 )
@@ -54,7 +55,12 @@ func helmPackageExists(packageName string, packageVersion string, application *A
     return false
   }
 
-  log.Printf("Found existing chart in these results: %s", result)
+  if strings.Contains(result, "knega-repo/" + application.name) {
+    log.Print("Found existing helm chart")
+    return true
+  }
 
-  return true
+  log.Printf("Something went wrong while checking for helm chart search command: %s returned the following results: %s", searchCommand, result)
+
+  return false
 }
