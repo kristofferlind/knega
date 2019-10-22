@@ -52,7 +52,7 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
     log.Print(inspectErr)
     return false
   }
-  log.Printf("%s: Found existing docker image", application.name)
+  // log.Printf("%s: Found existing docker image", application.name)
 
   return true
 }

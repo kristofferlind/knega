@@ -61,7 +61,7 @@ func helmPackageExists(packageName string, packageVersion string, application *A
   }
 
   if strings.Contains(result, "knega-repo/" + application.name) {
-    log.Printf("%s: Found existing helm chart", application.name)
+    // log.Printf("%s: Found existing helm chart", application.name)
     return true
   }
 

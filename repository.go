@@ -58,12 +58,13 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
 
 func getApplications(repository Repository) []Application {
   var results []Application
+  log.Print("Generating hashes of applications..")
   for _, searchFolder := range repository.searchDirectories {
     applicationConfigPaths := findSubDirectoriesWithFile(searchFolder, ".app.toml", repository.searchDepth)
     for _, applicationConfigPath := range applicationConfigPaths {
       application := initializeApplication(applicationConfigPath)
       results = append(results, application)
-      log.Printf("%s: %s", application.name, application.inputsHash)
+      // log.Printf("%s: %s", application.name, application.inputsHash)
     }
   }
   return results
