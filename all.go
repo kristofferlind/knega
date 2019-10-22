@@ -79,7 +79,7 @@ func all(action string) error {
 
   results := make(chan string, len(jobs))
 
-  go pipelineResults(results, done, startTime, len(jobs), true)
+  go pipelineResults(results, done, startTime, len(jobs), false)
   createWorkerPipeline(jobs, results)
 
   <-done

@@ -98,12 +98,7 @@ func createChart(cliContext *cli.Context, application Application, repository Re
   if inputsHash != "" {
     chart.Set("appVersion", inputsHash)
     chart.Set("version", chartVersion + "-" + inputsHash)
-  }
-
-  if appConfig.IsSet(("ingressUrl")) {
-    ingressUrl := appConfig.GetString("ingress.url")
-    defaultValues.Set("ingress.enabled", true)  // set from deploy-values
-    defaultValues.Set("ingress.url", ingressUrl)
+    defaultValues.Set("image.tag", inputsHash)
   }
 
   defaultValues.WriteConfig()

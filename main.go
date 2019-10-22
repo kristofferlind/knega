@@ -40,7 +40,17 @@ func main() {
     {
       Name:  "release",
       Usage: "Deploy",
-      Action: test,
+      Action: func(cliContext *cli.Context) error {
+        repository := initializeRepository(false)
+        var application Application
+        currentWorkingDirectory := getWorkingDirectory()
+
+        if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+          application = initializeApplication(currentWorkingDirectory)
+        }
+
+        return release(cliContext, application)
+      },
     },
     {
       Name: "chart",

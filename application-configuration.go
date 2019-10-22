@@ -3,6 +3,7 @@ package main
 import (
   "log"
   "bytes"
+  "os"
 
   "github.com/spf13/viper"
 )
@@ -12,6 +13,10 @@ type ApplicationConfiguration struct {
   inputs struct {
     filePaths []string
     gitFilePaths []string
+  }
+  environment struct {
+    name string
+    url string
   }
   outputs struct {
     dockerImage struct {
@@ -99,6 +104,11 @@ func getApplicationConfiguration(configurationPath string, repository Repository
   configuration.commands.build = configurationFile.GetStringSlice("Build.commands")
   configuration.commands.analyze = configurationFile.GetStringSlice("Analyze.commands")
   configuration.commands.release = configurationFile.GetStringSlice("Release.commands")
+
+  configuration.environment.name = os.Getenv("KNEGA_ENVIRONMENT")
+  if configuration.environment.name != "" {
+    configuration.environment.url = configurationFile.GetString(configuration.environment.name + ".url")
+  }
 
   return configuration
 }

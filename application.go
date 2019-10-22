@@ -14,6 +14,10 @@ type Application struct {
   path string
   name string
   inputsHash string
+  environment struct {
+    name string
+    url string
+  }
   docker struct {
     idFile string
     repository string
@@ -78,6 +82,9 @@ func initializeApplication(applicationPath string) Application {
   application.commands.build = injectVariablesArray(applicationConfiguration.commands.build, application)
   application.commands.analyze = injectVariablesArray(applicationConfiguration.commands.analyze, application)
   application.commands.release = injectVariablesArray(applicationConfiguration.commands.release, application)
+
+  application.environment.name = applicationConfiguration.environment.name
+  application.environment.url = applicationConfiguration.environment.url
 
   return application
 }
