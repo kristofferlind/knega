@@ -39,14 +39,19 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
   return nil
 }
 
+func setupHelmRepository(cliContext *cli.Context, repository Repository) error {
+  addRepoCommand := "helm repo add --username " + repository.helm.username
+  addRepoCommand += " --password " + repository.helm.password
+  addRepoCommand += " knega-repo " + repository.helm.repository
+  executeCommand(addRepoCommand, repository.path)
+
+  executeCommand("helm repo update", repository.path)
+
+  return nil
+}
+
 func helmPackageExists(packageName string, packageVersion string, application *Application) bool {
-  addRepoCommand := "helm repo add --username " + application.helm.username
-  addRepoCommand += " --password " + application.helm.password
-  addRepoCommand += " knega-repo " + application.helm.repository
-  executeCommand(addRepoCommand, application.path)
-
-  executeCommand("helm repo update", application.path)
-
+  // TODO: setupHelmRepository if knega-repo does not exist or just have it run once for first application it hits
   searchCommand := "helm search --version 1.0.0-" + application.inputsHash
   searchCommand += " knega-repo/" + application.name
   result := executeCommand(searchCommand, application.path)

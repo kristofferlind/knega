@@ -3,6 +3,7 @@ package main
 import (
   "log"
   "fmt"
+  "os"
 
   "github.com/spf13/viper"
 )
@@ -14,6 +15,9 @@ type Repository struct {
   applications []Application
   baseChartPath string
   helm struct{
+    username string
+    password string
+    repository string
     repositoryGitURL string
   }
 }
@@ -38,6 +42,9 @@ func initializeRepository(shouldIncludeApplications bool) Repository {
 
   // TODO: do update as part of chart upload instead, make it a job that runs for one of the applications once all workers are done
   repository.helm.repositoryGitURL = viper.GetString("Output.HelmChart.repositoryGitURL")
+  repository.helm.repository = viper.GetString("Output.HelmChart.repository")
+  repository.helm.username = os.Getenv("KNEGA_HELM_USERNAME")
+  repository.helm.password = os.Getenv("KNEGA_HELM_PASSWORD")
 
   if shouldIncludeApplications {
     directoriesExist(repository.searchDirectories)

@@ -77,6 +77,15 @@ func main() {
           },
         },
         {
+          Name: "setup-repository",
+          Usage: "knega chart setup-repository, needed for helm exist check to work (done seperately because it's slow)",
+          Action: func(cliContext *cli.Context) error {
+            repository := initializeRepository(false)
+
+            return setupHelmRepository(cliContext, repository)
+          },
+        },
+        {
           Name: "update-index",
           Usage: "knega chart update-index, updates repository index (done seperately to avoid conflicts while pushing",
           Action: func(cliContext *cli.Context) error {

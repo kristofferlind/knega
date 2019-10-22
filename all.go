@@ -95,6 +95,7 @@ func changed(action string) error {
   startTime := time.Now()
   repository := initializeRepository(true)
   var jobs []Job
+  // TODO: exist check for applications is kind of slow when run in sequence with many applications, make it run in parallell
   for _, application := range repository.applications {
     if application.hasChanges() {
       job := createJob(repository, application, action)
