@@ -192,5 +192,11 @@ func (application *Application) hasChanges() bool {
   imageTag := application.inputsHash
   hasDockerImage := dockerImageExists(imageName, imageTag, application)
 
-  return !(hasHelmPackage && hasDockerImage)
+  hasArtifacts := (hasHelmPackage && hasDockerImage)
+
+  if hasArtifacts {
+    log.Printf("%s: found existing artifacts, skipping", application.name)
+  }
+
+  return !hasArtifacts
 }
