@@ -30,9 +30,16 @@ func createWorker (workerId int, asyncWorkers *sync.WaitGroup, jobs <-chan Job, 
   asyncWorkers.Done()
 }
 
+func getMin(a int, b int) int {
+  if a <= b {
+    return a
+  }
+  return b
+}
+
 func createWorkerPipeline (jobs []Job, resultsChannel chan<- string) {
-  workerCount := runtime.NumCPU()
   jobsCount := len(jobs)
+  workerCount := getMin(runtime.NumCPU(), jobsCount)
   jobsChannel := make(chan Job, jobsCount)
 
   for _, job := range jobs {
