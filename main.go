@@ -144,6 +144,21 @@ func main() {
             return dockerUpload(cliContext, application)
           },
         },
+        {
+          Name: "vulnerability-scan",
+          Usage: "knega docker vulnerability-scan, scans docker image for known vulnerabilities (trivy)",
+          Action: func(cliContext *cli.Context) error {
+            repository := initializeRepository(false)
+            var application Application
+            currentWorkingDirectory := getWorkingDirectory()
+
+            if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+              application = initializeApplication(currentWorkingDirectory)
+            }
+
+            return dockerVulnerabilityScan(cliContext, application)
+          },
+        },
       },
     },
     {

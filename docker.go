@@ -5,6 +5,7 @@ import (
   "context"
   "encoding/json"
   "encoding/base64"
+  "os"
 
   "github.com/urfave/cli"
 	"docker.io/go-docker"
@@ -55,4 +56,24 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
   // log.Printf("%s: Found existing docker image", application.name)
 
   return true
+}
+
+func dockerVulnerabilityScan(cliContext *cli.Context, application Application) error {
+  // imageName := application.name + ":" + application.inputsHash
+  idFile := "container.id"
+  containerId := readFile(idFile)
+
+  // generate report
+  generatedPath := application.repository.path + "/.generated"
+  analyzePath := generatedPath + "/analyze"
+  if !directoryExists(generatedPath) {
+    os.Mkdir(generatedPath, 0777)
+  }
+  if !directoryExists(analyzePath) {
+    os.Mkdir(analyzePath, 0777)
+  }
+  reportPath := analyzePath + "/" + application.name + ".json"
+  executeCommand("trivy --no-progress --exit-code 1 -f json -o " + reportPath + " " + containerId, application.path)
+
+  return nil
 }
