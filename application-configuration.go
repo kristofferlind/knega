@@ -88,16 +88,16 @@ func getApplicationConfiguration(configurationPath string, repository Repository
   configuration.outputs.dockerImage.idFile = configurationFile.GetString("Output.DockerImage.idFile")
   configuration.outputs.dockerImage.repository = configurationFile.GetString("Output.DockerImage.repository")
   configuration.outputs.dockerImage.tag = configurationFile.GetString("Output.DockerImage.tag")
-  configuration.outputs.dockerImage.usernameEnv = "KNEGA_DOCKER_USERNAME" //configurationFile.GetString("Output.DockerImage.usernameEnv")
-  configuration.outputs.dockerImage.passwordEnv = "KNEGA_DOCKER_PASSWORD" //configurationFile.GetString("Output.DockerImage.passwordEnv")
+  configuration.outputs.dockerImage.usernameEnv = "KNEGA_DOCKER_USERNAME"
+  configuration.outputs.dockerImage.passwordEnv = "KNEGA_DOCKER_PASSWORD"
 
 
   configuration.outputs.helmChart.chartPath = configurationFile.GetString("Output.HelmChart.chartPath")
   configuration.outputs.helmChart.packageFilePath = configurationFile.GetString("Output.HelmChart.packageFilePath")
   configuration.outputs.helmChart.packageFileName = configurationFile.GetString("Output.HelmChart.packageFileName")
   configuration.outputs.helmChart.repository = configurationFile.GetString("Output.HelmChart.repository")
-  configuration.outputs.helmChart.usernameEnv = "KNEGA_HELM_USERNAME" //configurationFile.GetString("Output.HelmChart.usernameEnv")
-  configuration.outputs.helmChart.passwordEnv = "KNEGA_HELM_PASSWORD" //configurationFile.GetString("Output.HelmChart.passwordEnv")
+  configuration.outputs.helmChart.usernameEnv = "KNEGA_HELM_USERNAME"
+  configuration.outputs.helmChart.passwordEnv = "KNEGA_HELM_PASSWORD"
   configuration.outputs.helmChart.repositoryGitURL = configurationFile.GetString("Output.HelmChart.repositoryGitURL")
 
   configuration.commands.check = configurationFile.GetStringSlice("Check.commands")

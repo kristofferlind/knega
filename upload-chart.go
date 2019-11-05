@@ -56,7 +56,6 @@ func uploadChart(context *cli.Context, application Application) error {
   commitMessage := application.name + "-" + application.inputsHash
   log.Print(gitCommit(commitMessage, helmRepositoryPath))
 
-  // TODO: retry?
   retry(10, time.Second, func() error {
     err := gitPush(helmRepositoryPath)
     if err != nil {

@@ -9,7 +9,6 @@ import (
 )
 
 func executeCommand(command string, directory string) string {
-  // commandExecutor := exec.Command("sh", "-c", command)
   commandParts := strings.Split(command, " ")
   commandExecutor := exec.Command(commandParts[0], commandParts[1:]...)
   commandExecutor.Dir = directory

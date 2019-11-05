@@ -59,11 +59,9 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
 }
 
 func dockerVulnerabilityScan(cliContext *cli.Context, application Application) error {
-  // imageName := application.name + ":" + application.inputsHash
   idFile := "container.id"
   containerId := readFile(idFile)
 
-  // generate report
   generatedPath := application.repository.path + "/.generated"
   analyzePath := generatedPath + "/analyze"
   if !directoryExists(generatedPath) {
@@ -72,8 +70,10 @@ func dockerVulnerabilityScan(cliContext *cli.Context, application Application) e
   if !directoryExists(analyzePath) {
     os.Mkdir(analyzePath, 0777)
   }
-  reportPath := analyzePath + "/" + application.name + ".json"
-  executeCommand("trivy --no-progress --exit-code 1 -f json -o " + reportPath + " " + containerId, application.path)
+  // reportPath := analyzePath + "/" + application.name + ".json"
+
+  executeCommand("trivy --no-progress --exit-code 1 " + containerId, application.path)
+  // executeCommand("trivy --no-progress --clear-cache --auto-refresh --exit-code 1 -f json -o " + reportPath + " " + containerId, application.path)
 
   return nil
 }
