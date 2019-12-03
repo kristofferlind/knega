@@ -107,7 +107,7 @@ func getApplicationConfiguration(configurationPath string, repository Repository
 
   configuration.environment.name = os.Getenv("KNEGA_ENVIRONMENT")
   if configuration.environment.name != "" {
-    configuration.environment.urls = configurationFile.GetStringSlice(configuration.environment.name + ".url")
+    configuration.environment.urls = configurationFile.GetStringSlice(configuration.environment.name + ".urls")
   }
 
   return configuration

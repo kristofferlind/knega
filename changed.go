@@ -6,31 +6,29 @@ import (
   "time"
 )
 
-func getChangedApplications(applications []Application) []Application {
-  var changedApplications []Application
+func checkApplications(applications []Application) []Application {
+  var checkedApplications []Application
   var asyncChangedChecks sync.WaitGroup
 
-  changedApplicationsChannel := make(chan Application, len(applications))
+  checkedApplicationsChannel := make(chan Application, len(applications))
 
-  log.Print("Checking if docker images/helm charts exist with those hashes")
+  log.Print("Checking if artifacts exist with those hashes")
 
   for _, application := range applications {
     asyncChangedChecks.Add(1)
-    go func(changedApplicationsChannel chan<- Application, application Application) {
-      var hasChanges = application.hasChanges()
-      if hasChanges {
-        changedApplicationsChannel<-application
-      }
+    go func(checkedApplicationsChannel chan<- Application, application Application) {
+      application.hasChanges()
+      checkedApplicationsChannel<-application
       asyncChangedChecks.Done()
-    }(changedApplicationsChannel, application)
+    }(checkedApplicationsChannel, application)
   }
   asyncChangedChecks.Wait()
-  close(changedApplicationsChannel)
-  for changedApplication := range changedApplicationsChannel {
-    changedApplications = append(changedApplications, changedApplication)
+  close(checkedApplicationsChannel)
+  for checkedApplication := range checkedApplicationsChannel {
+    checkedApplications = append(checkedApplications, checkedApplication)
   }
 
-  return changedApplications
+  return checkedApplications
 }
 
 func changed(action string) error {
@@ -38,8 +36,14 @@ func changed(action string) error {
   repository := initializeRepository(true)
   var jobs []Job
 
-  changedApplications := getChangedApplications(repository.applications)
-  printStatus(changedApplications)
+  checkedApplications := checkApplications(repository.applications)
+  printBuildStatus(checkedApplications)
+  var changedApplications []Application
+  for _, application := range checkedApplications {
+    if application.changeStatus != Pristine {
+      changedApplications = append(changedApplications, application)
+    }
+  }
 
   if len(changedApplications) > 0 {
     for _, application := range changedApplications {

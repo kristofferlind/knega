@@ -13,7 +13,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/otiai10/copy v1.0.2
 	github.com/prune998/docker-registry-client v0.0.0-20190107194723-78de54b9f017
-	github.com/spf13/viper v1.4.0
+	github.com/spf13/viper v1.5.0
 	github.com/urfave/cli v1.22.1
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 )

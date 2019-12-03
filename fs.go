@@ -136,3 +136,19 @@ func readFile(path string) string {
   }
   return string(output[:])
 }
+
+func clearDirectory(path string) {
+  if directoryExists(path) {
+    rmErr := os.RemoveAll(path)
+    if rmErr != nil {
+      log.Fatal(rmErr)
+    }
+  }
+  os.Mkdir(path, 0777)
+}
+
+func createIfNotExists(path string) {
+  if !directoryExists(path) {
+    os.Mkdir(path, 0777)
+  }
+}

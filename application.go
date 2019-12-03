@@ -100,7 +100,7 @@ func initializeApplication(applicationPath string) Application {
   application.environment.name = applicationConfiguration.environment.name
   application.environment.urls = applicationConfiguration.environment.urls
 
-  // application.changeStatus = Unknown
+  application.changeStatus = Unknown
 
   return application
 }
@@ -211,16 +211,15 @@ func (application *Application) hasChanges() bool {
   hasArtifacts := (hasHelmPackage && hasDockerImage)
 
   if hasArtifacts {
-    // application.status = "pristine"
-    log.Printf("%s: found existing artifacts, skipping", application.name)
-  } // else {
-  //   application.status = "dirty"
-  // }
+    application.changeStatus = Pristine
+  } else {
+    application.changeStatus = Dirty
+  }
 
   return !hasArtifacts
 }
 
-func (applicaton *Application) hasTag() bool {
+func (application *Application) hasTag(tag string) bool {
   // check if has tag
   return false
 }

@@ -53,7 +53,6 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
     log.Print(inspectErr)
     return false
   }
-  // log.Printf("%s: Found existing docker image", application.name)
 
   return true
 }
@@ -63,17 +62,21 @@ func dockerVulnerabilityScan(cliContext *cli.Context, application Application) e
   containerId := readFile(idFile)
 
   generatedPath := application.repository.path + "/.generated"
-  analyzePath := generatedPath + "/analyze"
+  trivyCachePath := generatedPath + "/.trivy-cache"
+  // analyzePath := generatedPath + "/analyze"
   if !directoryExists(generatedPath) {
     os.Mkdir(generatedPath, 0777)
   }
-  if !directoryExists(analyzePath) {
-    os.Mkdir(analyzePath, 0777)
+  if !directoryExists(trivyCachePath) {
+    os.Mkdir(trivyCachePath, 0777)
   }
-  reportPath := analyzePath + "/" + application.name + ".json"
+  // if !directoryExists(analyzePath) {
+  //   os.Mkdir(analyzePath, 0777)
+  // }
+  // reportPath := analyzePath + "/" + application.name + ".json"
 
-  executeCommand("trivy --no-progress --exit-code 0 -f json -o " + reportPath + " " + containerId, application.path)
-  executeCommand("trivy --no-progress --exit-code 1 " + containerId, application.path)
+  // executeCommand("trivy --no-progress --exit-code 0 -f json -o " + reportPath + " " + containerId, application.path)
+  executeCommand("trivy --debug --cache-dir " + trivyCachePath + " --no-progress --exit-code 1 " + containerId, application.path)
 
   return nil
 }
