@@ -10,14 +10,28 @@ import (
   "os"
 )
 
+type ChangeStatus int
+
+const (
+  Unknown ChangeStatus = iota
+  Dirty
+  Pristine
+)
+
+func (changeStatus ChangeStatus) String() string {
+  return [...]string{"Unknown", "Dirty", "Pristine"}[changeStatus]
+}
+
 type Application struct {
   path string
   name string
   inputsHash string
   environment struct {
     name string
-    url string
+    urls []string
+    variables []string
   }
+  changeStatus ChangeStatus
   docker struct {
     idFile string
     repository string
@@ -84,7 +98,9 @@ func initializeApplication(applicationPath string) Application {
   application.commands.release = injectVariablesArray(applicationConfiguration.commands.release, application)
 
   application.environment.name = applicationConfiguration.environment.name
-  application.environment.url = applicationConfiguration.environment.url
+  application.environment.urls = applicationConfiguration.environment.urls
+
+  // application.changeStatus = Unknown
 
   return application
 }
@@ -195,8 +211,21 @@ func (application *Application) hasChanges() bool {
   hasArtifacts := (hasHelmPackage && hasDockerImage)
 
   if hasArtifacts {
+    // application.status = "pristine"
     log.Printf("%s: found existing artifacts, skipping", application.name)
-  }
+  } // else {
+  //   application.status = "dirty"
+  // }
 
   return !hasArtifacts
+}
+
+func (applicaton *Application) hasTag() bool {
+  // check if has tag
+  return false
+}
+
+func (application *Application) nameContains(value string) bool {
+  // check if name contains string
+  return false
 }

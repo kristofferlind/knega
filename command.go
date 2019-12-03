@@ -24,7 +24,7 @@ func executeCommand(command string, directory string) string {
   commandExecutor.Stderr = commandExecutor.Stdout
 
   startError := commandExecutor.Start()
-  // log.Printf("Executing command: %s in %s", command, directory)
+  
   if startError != nil {
     log.Printf("Executing command: %s in %s, crashed before receiving any output", command, directory)
     log.Fatal(startError)

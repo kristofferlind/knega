@@ -70,10 +70,10 @@ func dockerVulnerabilityScan(cliContext *cli.Context, application Application) e
   if !directoryExists(analyzePath) {
     os.Mkdir(analyzePath, 0777)
   }
-  // reportPath := analyzePath + "/" + application.name + ".json"
+  reportPath := analyzePath + "/" + application.name + ".json"
 
+  executeCommand("trivy --no-progress --exit-code 0 -f json -o " + reportPath + " " + containerId, application.path)
   executeCommand("trivy --no-progress --exit-code 1 " + containerId, application.path)
-  // executeCommand("trivy --no-progress --clear-cache --auto-refresh --exit-code 1 -f json -o " + reportPath + " " + containerId, application.path)
 
   return nil
 }
