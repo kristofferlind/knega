@@ -7,6 +7,7 @@ import (
 )
 
 var (
+  Info = Teal
   Success = Green
   Warning = Yellow
   Fatal = Red
@@ -16,6 +17,7 @@ var (
   Red     = Color("\033[1;31m%s\033[0m")
   Yellow  = Color("\033[1;33m%s\033[0m")
   Green   = Color("\033[1;32m%s\033[0m")
+  Teal    = Color("\033[1;36m%s\033[0m")
 )
 
 func Color(colorString string) func(...interface{}) string {

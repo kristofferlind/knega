@@ -30,15 +30,12 @@ func executeCommand(command string, directory string) string {
 
   var outputBuffer bytes.Buffer
 
-  firstLine := true
   scanner := bufio.NewScanner(logReader)
 
+  outputBuffer.Write([]byte("COMMAND: " + Info(command) + " in DIRECTORY: " + Info(directory)))
+
   for scanner.Scan() {
-    if firstLine {
-      firstLine = false
-    } else {
-      outputBuffer.WriteRune('\n')
-    }
+    outputBuffer.WriteRune('\n')
     outputBuffer.Write(scanner.Bytes())
   }
 
