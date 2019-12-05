@@ -147,6 +147,13 @@ func main() {
         {
           Name: "vulnerability-scan",
           Usage: "knega docker vulnerability-scan, scans docker image for known vulnerabilities (trivy)",
+          Flags: []cli.Flag{
+            cli.StringFlag{
+              Name: "exit-code",
+              Value: "1",
+              Usage: "Set exit-code for vulnerabilities found",
+            },
+          },
           Action: func(cliContext *cli.Context) error {
             repository := initializeRepository(false)
             var application Application

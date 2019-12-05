@@ -60,23 +60,24 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
 func dockerVulnerabilityScan(cliContext *cli.Context, application Application) error {
   idFile := "container.id"
   containerId := readFile(idFile)
+  exitCode := cliContext.String("exit-code")
 
   generatedPath := application.repository.path + "/.generated"
   trivyCachePath := generatedPath + "/.trivy-cache"
-  // analyzePath := generatedPath + "/analyze"
+  analyzePath := generatedPath + "/analyze"
   if !directoryExists(generatedPath) {
     os.Mkdir(generatedPath, 0777)
   }
   if !directoryExists(trivyCachePath) {
     os.Mkdir(trivyCachePath, 0777)
   }
-  // if !directoryExists(analyzePath) {
-  //   os.Mkdir(analyzePath, 0777)
-  // }
-  // reportPath := analyzePath + "/" + application.name + ".json"
+  if !directoryExists(analyzePath) {
+    os.Mkdir(analyzePath, 0777)
+  }
+  reportPath := analyzePath + "/" + application.name + ".json"
 
-  // executeCommand("trivy --no-progress --exit-code 0 -f json -o " + reportPath + " " + containerId, application.path)
-  executeCommand("trivy --debug --cache-dir " + trivyCachePath + " --no-progress --exit-code 1 " + containerId, application.path)
+  executeCommand("trivy --cache-dir " + trivyCachePath + " --no-progress --exit-code 0 -f json -o " + reportPath + " " + containerId, application.path)
+  executeCommand("trivy --cache-dir " + trivyCachePath + " --no-progress --exit-code " + exitCode + " " + containerId, application.path)
 
   return nil
 }
