@@ -114,6 +114,7 @@ func createChart(cliContext *cli.Context, application Application, repository Re
   convertFileContentToLowerCase(".generated/" + applicationName + "/templates/deployment.yaml")
   convertFileContentToLowerCase(".generated/" + applicationName + "/templates/hpa.yaml")
   convertFileContentToLowerCase(".generated/" + applicationName + "/templates/ingress.yaml")
+  convertFileContentToLowerCase(".generated/" + applicationName + "/templates/networkpolicy.yaml")
   convertFileContentToLowerCase(".generated/" + applicationName + "/templates/pdb.yaml")
   convertFileContentToLowerCase(".generated/" + applicationName + "/templates/service.yaml")
 

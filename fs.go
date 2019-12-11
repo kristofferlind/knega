@@ -125,6 +125,7 @@ func convertFileContentToLowerCase(path string) {
   lowerCaseContent = bytes.Replace(lowerCaseContent, []byte(".podDisruptionBudget"), []byte(".poddisruptionbudget"), -1)
   lowerCaseContent = bytes.Replace(lowerCaseContent, []byte(".minAvailable"), []byte(".minavailable"), -1)
   lowerCaseContent = bytes.Replace(lowerCaseContent, []byte(".maxUnavailable"), []byte(".maxunavailable"), -1)
+  lowerCaseContent = bytes.Replace(lowerCaseContent, []byte(".networkPolicy"), []byte(".networkpolicy"), -1)
 
   err = ioutil.WriteFile(path, lowerCaseContent, 0777)
 }
