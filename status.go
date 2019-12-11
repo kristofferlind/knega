@@ -32,13 +32,13 @@ func printBuildStatus(applications []Application) {
   writer := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.StripEscape)
   for _, application := range applications {
     if application.changeStatus == Unknown {
-      fmt.Fprintf(writer, "%s: \t " + Warning("Unknown") + "\n", application.name)
+      fmt.Fprintf(writer, "%s: \t " + Warning("Unknown") + "\t %s\n", application.name, application.inputsHash[0:19])
     }
     if application.changeStatus == Dirty {
-      fmt.Fprintf(writer, "%s: \t " + Fatal("Rebuild required") + "\n", application.name)
+      fmt.Fprintf(writer, "%s: \t " + Fatal("Rebuild required") + "\t %s\n", application.name, application.inputsHash[0:19])
     }
     if application.changeStatus == Pristine {
-      fmt.Fprintf(writer, "%s: \t " + Success("Artifacts found") + "\n", application.name)
+      fmt.Fprintf(writer, "%s: \t " + Success("Artifacts found") + "\t %s\n", application.name, application.inputsHash[0:19])
     }
   }
   writer.Flush()
