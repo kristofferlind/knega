@@ -39,10 +39,22 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
   return nil
 }
 
+func getLatestCommit(repository Repository) string {
+  command := "git ls-remote " + repository.helm.repositoryGitURL + " refs/heads/master"
+  commandResult := executeCommand(command, repository.path)
+  commandLines := strings.Split(commandResult, "\n")
+  commandParts := strings.Fields(commandLines[1])
+  commitId := commandParts[0]
+
+  return commitId
+}
+
 func setupHelmRepository(cliContext *cli.Context, repository Repository) error {
+  commitId := getLatestCommit(repository)
+  repositoryCommitUrl := strings.Replace(repository.helm.repository, "master", commitId, 1)
   addRepoCommand := "helm repo add --username " + repository.helm.username
   addRepoCommand += " --password " + repository.helm.password
-  addRepoCommand += " knega-repo " + repository.helm.repository
+  addRepoCommand += " knega-repo " + repositoryCommitUrl
   executeCommand(addRepoCommand, repository.path)
 
   executeCommand("helm repo update", repository.path)
