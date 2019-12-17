@@ -5,6 +5,7 @@ import (
   "os"
   "log"
   "strings"
+  "regexp"
 
   "github.com/urfave/cli"
 )
@@ -42,9 +43,9 @@ func updateHelmIndex(cliContext *cli.Context, repository Repository) error {
 func getLatestCommit(repository Repository) string {
   command := "git ls-remote " + repository.helm.repositoryGitURL + " refs/heads/master"
   commandResult := executeCommand(command, repository.path)
-  commandLines := strings.Split(commandResult, "\n")
-  commandParts := strings.Fields(commandLines[1])
-  commitId := commandParts[0]
+
+  expression, _ := regexp.Compile("([a-f0-9]{40})")
+  commitId := expression.FindString(commandResult)
 
   return commitId
 }
