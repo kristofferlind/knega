@@ -16,7 +16,7 @@ func codeQuality(application Application, repository Repository) error {
   scanCommand += "-e CODECLIMATE_CODE=" + application.path + " "
   scanCommand += "codeclimate/codeclimate analyze -f html"
 
-  result := executeCommand(scanCommand, application.repository.path)
+  result := executeCommandNoExtraLogs(scanCommand, application.repository.path)
 
   fileData := []byte(result)
   writeError := ioutil.WriteFile(reportPath + "/" + application.name + ".html", fileData, 0777)
