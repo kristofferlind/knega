@@ -13,7 +13,10 @@ func release(cliContext *cli.Context, application Application) error {
   createIfNotExists(fetchPath)
   createIfNotExists(renderPath)
 
-  fetchCommand := "helm fetch --repo " + application.helm.repository
+  commitId := getLatestCommit(repository)
+  repositoryCommitUrl := strings.Replace(application.helm.repository, "master", commitId, 1)
+
+  fetchCommand := "helm fetch --repo " + repositoryCommitUrl
   fetchCommand += " --username " + application.helm.username
   fetchCommand += " --password " + application.helm.password
   fetchCommand += " --untar --untardir " + fetchPath

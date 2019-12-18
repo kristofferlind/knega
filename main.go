@@ -27,6 +27,21 @@ func main() {
 
   app.Commands = []cli.Command{
     {
+      Name: "code-quality",
+      Usage: "knega code-quality, uses codeclimate to analyze code quality and generate html report",
+      Action: func(cliContext *cli.Context) error {
+        repository := initializeRepository(false)
+        var application Application
+        currentWorkingDirectory := getWorkingDirectory()
+
+        if (path.Clean(currentWorkingDirectory) != path.Clean(repository.path)) {
+          application = initializeApplication(currentWorkingDirectory)
+        }
+
+        return codeQuality(application, repository)
+      },
+    },
+    {
       Name:  "build",
       Usage: "Builds application (uses dockerfile if it exists, otherwise tries herokuish)",
       Action: build,
