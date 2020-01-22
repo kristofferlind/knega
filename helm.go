@@ -69,12 +69,11 @@ func helmPackageExists(packageName string, packageVersion string, application *A
   searchCommand += " knega-repo/" + application.name
   result := executeCommand(searchCommand, application.path)
 
-  if result == "No results found" {
+  if strings.Contains(result, "No results found") {
     return false
   }
 
-  if strings.Contains(result, "knega-repo/" + application.name) {
-    // log.Printf("%s: Found existing helm chart", application.name)
+  if strings.Contains(result, "APP VERSION") {
     return true
   }
 
