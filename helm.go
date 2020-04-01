@@ -65,7 +65,7 @@ func setupHelmRepository(cliContext *cli.Context, repository Repository) error {
 
 func helmPackageExists(packageName string, packageVersion string, application *Application) bool {
   // TODO: setupHelmRepository if knega-repo does not exist or just have it run once for first application it hits
-  searchCommand := "helm search --version 1.0.0-" + application.inputsHash
+  searchCommand := "helm search repo --version 1.0.0-" + application.inputsHash
   searchCommand += " knega-repo/" + application.name
   result := executeCommand(searchCommand, application.path)
 
