@@ -208,7 +208,9 @@ func (application *Application) hasChanges() bool {
   imageTag := application.inputsHash
   hasDockerImage := dockerImageExists(imageName, imageTag, application)
 
-  hasArtifacts := (hasHelmPackage && hasDockerImage)
+  skipHelmPackage := application.helm.repository == ""
+  skipDockerImage := application.docker.repository == ""
+  hasArtifacts := ((skipHelmPackage || hasHelmPackage) && (skipDockerImage || hasDockerImage))
 
   if hasArtifacts {
     application.changeStatus = Pristine
