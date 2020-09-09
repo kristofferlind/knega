@@ -47,10 +47,8 @@ func changed(action string) error {
 
   if len(changedApplications) > 0 {
     for _, application := range changedApplications {
-      if application.hasChanges() {
-        job := createJob(repository, application, action)
-        jobs = append(jobs, job)
-      }
+      job := createJob(repository, application, action)
+      jobs = append(jobs, job)
     }
 
     done := make(chan bool, 1)
