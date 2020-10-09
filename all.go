@@ -16,6 +16,9 @@ func createWorker (workerId int, asyncWorkers *sync.WaitGroup, jobs <-chan Job, 
 
     for _, jobCommand := range job.commands {
       output := executeCommand(jobCommand, job.application.path)
+      if IsTrace() {
+        log.Printf("%s", output)
+      }
       result += output
     }
 

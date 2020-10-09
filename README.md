@@ -4,6 +4,9 @@ CLI tool for commonly used generic CI/CD steps (analyze, build and deploy action
 ## Usage
 Tool has help sections describing all the different actions, overview found by running `knega`
 
+### Troubleshooting builds
+`KNEGA_TRACE=true` set as environment variable will enable trace mode.
+
 ### Examples
 #### Monorepo actions
 Example configurations can be found in [examples/](./examples), [.knega.root.toml](./examples/.knega.root.toml) should be at project root and [.app.toml](./examples/.app.toml) should exist for every application
