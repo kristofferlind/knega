@@ -47,6 +47,7 @@ type Application struct {
     username string
     password string
     repositoryGitURL string
+    repositoryOCI string
   }
   commands struct {
     check []string
@@ -87,6 +88,8 @@ func initializeApplication(applicationPath string) Application {
   application.helm.packageFileName = injectVariables(applicationConfiguration.outputs.helmChart.packageFileName, application)
   application.helm.repository = injectVariables(applicationConfiguration.outputs.helmChart.repository, application)
   application.helm.repositoryGitURL = injectVariables(applicationConfiguration.outputs.helmChart.repositoryGitURL, application)
+  application.helm.repositoryOCI = injectVariables(applicationConfiguration.outputs.helmChart.repositoryOCI, application)
+
   helmUsernameEnv := injectVariables(applicationConfiguration.outputs.helmChart.usernameEnv, application)
   helmPasswordEnv := injectVariables(applicationConfiguration.outputs.helmChart.passwordEnv, application)
   application.helm.username = os.Getenv(helmUsernameEnv)
@@ -200,15 +203,18 @@ func generateInputsHash (inputs []BuildInput) string {
 }
 
 func (application *Application) hasChanges() bool {
-  packageName := application.name
-  packageVersion := "1.0.0-" + application.inputsHash
-  hasHelmPackage := helmPackageExists(packageName, packageVersion, application)
+  hasHelmPackage := false
+  if application.helm.repositoryOCI != "" {
+    hasHelmPackage = ociHelmPackageExists(application)
+  } else if application.helm.repository != "" {
+    hasHelmPackage = helmPackageExists(application)
+  }
 
   imageName := application.name
   imageTag := application.inputsHash
   hasDockerImage := dockerImageExists(imageName, imageTag, application)
 
-  skipHelmPackage := application.helm.repository == ""
+  skipHelmPackage := (application.helm.repository == "" && application.helm.repositoryOCI == "")
   skipDockerImage := application.docker.repository == ""
   hasArtifacts := ((skipHelmPackage || hasHelmPackage) && (skipDockerImage || hasDockerImage))
 

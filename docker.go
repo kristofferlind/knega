@@ -30,7 +30,7 @@ func dockerUpload(cliContext *cli.Context, application Application) error {
   return nil
 }
 
-func dockerImageExists(imageName string, imageTag string, application *Application) bool {
+func ociImageExists(imagePath string, username string, password string) bool {
   context := context.Background()
   cli, err := docker.NewEnvClient()
 	if err != nil {
@@ -38,8 +38,8 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
 	}
 
   inspectAuthConfig := types.AuthConfig{
-		Username: application.docker.username,
-    Password: application.docker.password,
+		Username: username,
+    Password: password,
 	}
 	encodedJSON, err := json.Marshal(inspectAuthConfig)
 	if err != nil {
@@ -47,14 +47,19 @@ func dockerImageExists(imageName string, imageTag string, application *Applicati
 	}
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 
-  fullImagePath := application.docker.repository + ":" + imageTag
-  _, inspectErr := cli.DistributionInspect(context, fullImagePath, authStr)
+  _, inspectErr := cli.DistributionInspect(context, imagePath, authStr)
   if inspectErr != nil {
     log.Print(inspectErr)
     return false
   }
 
   return true
+}
+
+func dockerImageExists(imageName string, imageTag string, application *Application) bool {
+  fullImagePath := application.docker.repository + ":" + imageTag
+
+  return ociImageExists(fullImagePath, application.docker.username, application.docker.password)
 }
 
 func dockerVulnerabilityScan(cliContext *cli.Context, application Application) error {

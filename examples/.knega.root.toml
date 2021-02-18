@@ -37,8 +37,11 @@ applicationSearchDepth = 2
     # i run knega chart update-index after build to avoid it happening in parallell
     packageFilePath = ".generated"
     packageFileName = "$APPLICATION_NAME-1.0.0-$INPUTS_HASH.tgz"
+    # git based repository
     repository = "https://raw.githubusercontent.com/user/repository/master"
     repositoryGitURL = "git@github.com:user/repository.git"
+    # or oci based repository
+    repositoryOCI = "some-registry.com/some-category/$APPLICATION_NAME"
     # below are hardcoded for now
     # usernameEnv = "KNEGA_HELM_USERNAME"
     # passwordEnv = "KNEGA_HELM_PASSWORD"

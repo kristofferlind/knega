@@ -35,6 +35,7 @@ type ApplicationConfiguration struct {
       usernameEnv string
       passwordEnv string
       repositoryGitURL string
+      repositoryOCI string
     }
   }
   commands struct {
