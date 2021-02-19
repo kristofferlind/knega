@@ -65,7 +65,7 @@ func setupHelmRepository(cliContext *cli.Context, repository Repository) error {
 
 func ociHelmPackageExists(application *Application) bool {
   packageVersion := "1.0.0-" + application.inputsHash
-  imagePath := application.helm.repositoryOCI + ":" + packageVersion[:128]
+  imagePath := application.helm.repositoryOCI + ":" + packageVersion
   return ociImageExists(imagePath, application.helm.username, application.helm.password)
 }
 
