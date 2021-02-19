@@ -193,7 +193,7 @@ func deDuplicateStringSlice(paths []string) []string {
 }
 
 func generateInputsHash (inputs []BuildInput) string {
-  hash := sha512.New()
+  hash := sha512.New384()
   for _, input := range inputs {
     hash.Write(input.Hash())
   }

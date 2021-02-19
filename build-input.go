@@ -36,7 +36,7 @@ func (buildInput *BuildInput) Hash() []byte {
   // close file on function return
   defer file.Close()
 
-  hash := sha512.New()
+  hash := sha512.New384()
 
   _, copyErr := io.Copy(hash, file)
   if copyErr != nil {
