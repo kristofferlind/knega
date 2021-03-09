@@ -76,6 +76,7 @@ func getApplicationConfiguration(configurationPath string, repository Repository
   configuration.outputs.helmChart.usernameEnv = "KNEGA_HELM_USERNAME"
   configuration.outputs.helmChart.passwordEnv = "KNEGA_HELM_PASSWORD"
   configuration.outputs.helmChart.repositoryGitURL = configurationFile.GetString("Output.HelmChart.repositoryGitURL")
+  configuration.outputs.helmChart.repositoryOCI = configurationFile.GetString("Output.HelmChart.repositoryOCI")
 
   configuration.commands.check = configurationFile.GetStringSlice("Check.commands")
   configuration.commands.build = configurationFile.GetStringSlice("Build.commands")
